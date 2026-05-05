@@ -1,481 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TiffinGenie Blog | Nutrition Tips for Parents</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .blog-hero {
+            padding: 80px 20px 40px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(255,122,162,0.05) 0%, transparent 100%);
+        }
 
-<title>TiffinGenie Blog</title>
+        .blog-hero h1 {
+            font-size: 52px;
+            font-family: 'Fredoka';
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: var(--max-width);
+            margin: 40px auto 100px;
+            padding: 0 20px;
+        }
 
-<style>
+        .blog-card {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            border: 1px solid #f0f0f0;
+            transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+        }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255,122,162,0.12);
+            border-color: rgba(255,122,162,0.3);
+        }
 
-body{
-font-family:'Poppins',sans-serif;
-background:linear-gradient(135deg,#ffeaf3,#e9f6ff);
-overflow-x:hidden;
-color:#333;
-}
+        .blog-img {
+            width: 100%;
+            height: 220px;
+            background-color: #f9fafb;
+            background-position: center;
+            background-size: cover;
+            position: relative;
+        }
 
-/* CANVAS BACKGROUND */
+        .blog-category {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 6px 15px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ff7aa2;
+            text-transform: uppercase;
+        }
 
-#canvas{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-1;
-}
+        .blog-content {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
 
-/* NAVBAR */
+        .blog-content h3 {
+            font-family: 'Fredoka';
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #111827;
+            line-height: 1.3;
+        }
 
-nav{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:20px 8%;
-background:white;
-box-shadow:0 3px 15px rgba(0,0,0,0.05);
-}
+        .blog-content p {
+            color: #6b7280;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
 
-nav h1{
-font-family:'Fredoka',sans-serif;
-color:#ff7aa2;
-}
+        .blog-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #9ca3af;
+        }
 
-nav ul{
-display:flex;
-gap:25px;
-list-style:none;
-}
+        .read-more {
+            color: #ff7aa2;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
-nav a{
-text-decoration:none;
-color:#444;
-font-weight:500;
-}
-
-nav a:hover{
-color:#ff7aa2;
-}
-
-/* HERO */
-
-.hero{
-text-align:center;
-padding:80px 20px;
-position:relative;
-}
-
-.hero h2{
-font-size:48px;
-font-family:'Fredoka',sans-serif;
-background:linear-gradient(90deg,#ff7aa2,#6aa9ff);
--webkit-background-clip:text;
-color:transparent;
-animation:fadeUp 1s ease;
-}
-
-.hero p{
-margin-top:15px;
-color:#555;
-max-width:600px;
-margin-left:auto;
-margin-right:auto;
-animation:fadeUp 1.4s ease;
-}
-
-/* STICKERS */
-
-.sticker{
-position:absolute;
-width:60px;
-animation:float 6s infinite ease-in-out;
-}
-
-.s1{top:20%;left:10%;}
-.s2{top:25%;right:10%;}
-.s3{bottom:10%;left:15%;}
-.s4{bottom:15%;right:15%;}
-
-@keyframes float{
-0%{transform:translateY(0)}
-50%{transform:translateY(-20px)}
-100%{transform:translateY(0)}
-}
-
-/* BLOG GRID */
-
-.blog{
-padding:60px 8%;
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-gap:30px;
-}
-
-/* BLOG CARD */
-
-.card{
-background:white;
-border-radius:20px;
-padding:25px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
-transition:0.4s;
-opacity:0;
-transform:translateY(40px);
-}
-
-.card.show{
-opacity:1;
-transform:translateY(0);
-}
-
-.card:hover{
-transform:translateY(-12px) scale(1.03);
-box-shadow:0 20px 40px rgba(0,0,0,0.15);
-}
-
-.card img{
-width:60px;
-margin-bottom:15px;
-}
-
-.card h3{
-font-family:'Fredoka',sans-serif;
-margin-bottom:10px;
-color:#444;
-}
-
-.card p{
-font-size:14px;
-color:#666;
-margin-bottom:18px;
-}
-
-/* BUTTON */
-
-.btn{
-padding:10px 20px;
-border:none;
-border-radius:25px;
-background:#ff7aa2;
-color:white;
-cursor:pointer;
-transition:0.3s;
-}
-
-.btn:hover{
-transform:scale(1.1);
-box-shadow:0 8px 20px rgba(255,122,162,0.4);
-}
-
-/* FOOTER */
-
-footer{
-background:linear-gradient(135deg,#ff6fa5,#6aa9ff);
-color:white;
-padding:50px 10% 20px;
-margin-top:60px;
-}
-
-.footer-container{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:30px;
-}
-
-.footer-box h2{
-margin-bottom:10px;
-}
-
-.footer-box h3{
-margin-bottom:10px;
-}
-
-.footer-box p{
-font-size:14px;
-line-height:1.6;
-}
-
-.footer-box ul{
-list-style:none;
-}
-
-.footer-box ul li{
-margin:8px 0;
-}
-
-.footer-box ul li a{
-text-decoration:none;
-color:white;
-transition:0.3s;
-}
-
-.footer-box ul li a:hover{
-padding-left:5px;
-}
-
-.social a{
-font-size:22px;
-margin-right:10px;
-transition:0.3s;
-display:inline-block;
-}
-
-.social a:hover{
-transform:scale(1.3);
-}
-
-.footer-bottom{
-text-align:center;
-margin-top:30px;
-border-top:1px solid rgba(255,255,255,0.3);
-padding-top:15px;
-font-size:14px;
-}
-
-/* ANIMATION */
-
-@keyframes fadeUp{
-from{
-opacity:0;
-transform:translateY(40px);
-}
-to{
-opacity:1;
-transform:translateY(0);
-}
-}
-
-</style>
+        .read-more:hover { text-decoration: underline; }
+    </style>
 </head>
-
 <body>
 
-<canvas id="canvas"></canvas>
+    <div id="navbar-placeholder"></div>
 
-<!-- NAVBAR -->
+    <section class="blog-hero">
+        <h1>Genie's Kitchen Journal</h1>
+        <p style="color: #6b7280; font-size: 18px; max-width: 600px; margin: 0 auto;">Expert advice, nutrition hacks, and stories from the TiffinGenie community.</p>
+    </section>
 
-<nav style="display:flex; justify-content:space-between; align-items:center; padding:15px 5%; background:white; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-  <div style="flex:1;">
-    <h2 onclick="window.location.href='index.html'" style="font-family:'Fredoka', sans-serif; color:#ff7aa2; cursor:pointer; margin:0; font-size:24px;">TiffinGenie</h2>
-  </div>
+    <div class="blog-grid">
+        <!-- Post 1 -->
+        <article class="blog-card">
+            <div class="blog-img" style="background-image: url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&q=80&w=1000')">
+                <span class="blog-category">Nutrition</span>
+            </div>
+            <div class="blog-content">
+                <h3>5 High-Protein Indian Snacks for Active Kids</h3>
+                <p>Learn how to incorporate traditional lentils and dairy into tasty snacks that keep your child energized throughout the school day.</p>
+                <div class="blog-footer">
+                    <span>Oct 12, 2026</span>
+                    <a href="#" class="read-more">Read Story →</a>
+                </div>
+            </div>
+        </article>
 
-  <div style="flex:2; display:flex; justify-content:center;">
-    <ul style="display:flex; gap:25px; list-style:none; padding:0; margin:0;">
-      <li><a href="index.html" style="color:#444; font-weight:500; text-decoration:none;">Home</a></li>
-      <li><a href="about.html" style="color:#444; font-weight:500; text-decoration:none;">About Us</a></li>
-      <li><a href="pricing.html" style="color:#444; font-weight:500; text-decoration:none;">Pricing</a></li>
-      <li><a href="how-it-works.html" style="color:#444; font-weight:500; text-decoration:none;">How It Works</a></li>
-      <li><a href="dashboard.html" style="color:#444; font-weight:500; text-decoration:none;">Dashboard</a></li>
-      <li><a href="contact.html" style="color:#444; font-weight:500; text-decoration:none;">Contact</a></li>
-    </ul>
-  </div>
+        <!-- Post 2 -->
+        <article class="blog-card">
+            <div class="blog-img" style="background-image: url('https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&q=80&w=1000')">
+                <span class="blog-category">Life Hacks</span>
+            </div>
+            <div class="blog-content">
+                <h3>The 10-Minute Morning Tiffin Routine</h3>
+                <p>Ditch the morning stress. Discover the meal prep secrets that help busy parents pack nutritious tiffins in under 10 minutes.</p>
+                <div class="blog-footer">
+                    <span>Oct 10, 2026</span>
+                    <a href="#" class="read-more">Read Story →</a>
+                </div>
+            </div>
+        </article>
 
-  <div id="navUserSection" style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:15px; min-width:240px;">
-    <!-- JS Session dynamically injects identity states here -->
-    <a href="login.html" style="color:#6aa9ff; font-weight:600; text-decoration:none;">Login</a>
-    <a href="onboarding.html" class="btn" style="padding:10px 20px; background:linear-gradient(45deg,#ff7aa2,#ff4d88); color:white; border-radius:20px; text-decoration:none; font-weight:600;">Get Started</a>
-  </div>
-</nav>
+        <!-- Post 3 -->
+        <article class="blog-card">
+            <div class="blog-img" style="background-image: url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=1000')">
+                <span class="blog-category">Community</span>
+            </div>
+            <div class="blog-content">
+                <h3>Success Story: How Arjun Beat Picky Eating</h3>
+                <p>One mother shares her journey using TiffinGenie to introduce new vegetables to her toddler through creative Indian recipes.</p>
+                <div class="blog-footer">
+                    <span>Oct 08, 2026</span>
+                    <a href="#" class="read-more">Read Story →</a>
+                </div>
+            </div>
+        </article>
+    </div>
 
-<!-- HERO -->
-
-<section class="hero">
-
-<img class="sticker s1" src="https://cdn-icons-png.flaticon.com/512/2921/2921822.png">
-<img class="sticker s2" src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
-<img class="sticker s3" src="https://cdn-icons-png.flaticon.com/512/135/135620.png">
-<img class="sticker s4" src="https://cdn-icons-png.flaticon.com/512/590/590685.png">
-
-<h2>TiffinGenie Resources</h2>
-
-<p>Helpful nutrition tips and school lunch ideas to make healthy eating easier for parents and kids.</p>
-
-</section>
-
-<!-- BLOG GRID -->
-
-<section class="blog">
-
-<div class="card">
-<img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
-<h3>Healthy School Lunch Ideas</h3>
-<p>Explore creative and nutritious lunchbox ideas that kids enjoy while staying healthy.</p>
-<button class="btn">Read More</button>
-</div>
-
-<div class="card">
-<img src="https://cdn-icons-png.flaticon.com/512/2921/2921822.png">
-<h3>Child Nutrition Tips</h3>
-<p>Understand essential nutrients required for children's growth and development.</p>
-<button class="btn">Read More</button>
-</div>
-
-<div class="card">
-<img src="https://cdn-icons-png.flaticon.com/512/135/135620.png">
-<h3>Balanced Meal Planning</h3>
-<p>Learn how to prepare balanced meals including proteins, vitamins and healthy carbs.</p>
-<button class="btn">Read More</button>
-</div>
-
-<div class="card">
-<img src="https://cdn-icons-png.flaticon.com/512/590/590685.png">
-<h3>Healthy Snack Alternatives</h3>
-<p>Discover nutritious snack options that replace junk food with healthy choices.</p>
-<button class="btn">Read More</button>
-</div>
-
-<div class="card">
-<img src="https://cdn-icons-png.flaticon.com/512/2921/2921822.png">
-<h3>Parenting Food Advice</h3>
-<p>Tips for parents on encouraging children to enjoy healthy meals every day.</p>
-<button class="btn">Read More</button>
-</div>
-
-<div class="card">
-<img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
-<h3>Fun Lunchbox Recipes</h3>
-<p>Simple and tasty recipes designed especially for school tiffins.</p>
-<button class="btn">Read More</button>
-</div>
-
-</section>
-
-<footer class="footer">
-
-<div class="footer-container">
-
-<!-- BRAND -->
-<div class="footer-box">
-<h2>TiffinGenie</h2>
-<p>Healthy Tiffins, Happy Kids 🍱  
-Smart meal planning for better nutrition.</p>
-</div>
-
-<!-- LINKS -->
-<div class="footer-box">
-<h3>Quick Links</h3>
-<ul>
-<li><a href="index.html">Home</a></li>
-<li><a href="about.html">About</a></li>
-<li><a href="pricing.html">Pricing</a></li>
-<li><a href="blog.html">Blog</a></li>
-<li><a href="contact.html">Contact</a></li>
-</ul>
-</div>
-
-<!-- CONTACT -->
-<div class="footer-box">
-<h3>Contact</h3>
-<p>Email: support@tiffingenie.com</p>
-<p>Phone: +91 98765 43210</p>
-<p>India</p>
-</div>
-
-<!-- SOCIAL -->
-<div class="footer-box">
-<h3>Follow Us</h3>
-<div class="social">
-<a href="#">🌐</a>
-<a href="#">📸</a>
-<a href="#">🐦</a>
-<a href="#">💼</a>
-</div>
-</div>
-
-</div>
-
-<div class="footer-bottom">
-<p>© 2026 TiffinGenie | All Rights Reserved</p>
-</div>
-
-</footer>
-
-<script>
-
-/* CANVAS FLOATING PARTICLES */
-
-const canvas=document.getElementById("canvas");
-const ctx=canvas.getContext("2d");
-
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-let particles=[];
-
-class Particle{
-constructor(){
-this.x=Math.random()*canvas.width;
-this.y=Math.random()*canvas.height;
-this.size=Math.random()*3;
-this.speedX=(Math.random()-0.5)*0.5;
-this.speedY=(Math.random()-0.5)*0.5;
-}
-
-update(){
-this.x+=this.speedX;
-this.y+=this.speedY;
-
-if(this.x>canvas.width) this.x=0;
-if(this.x<0) this.x=canvas.width;
-
-if(this.y>canvas.height) this.y=0;
-if(this.y<0) this.y=canvas.height;
-}
-
-draw(){
-ctx.fillStyle="rgba(255,122,162,0.3)";
-ctx.beginPath();
-ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
-ctx.fill();
-}
-}
-
-for(let i=0;i<100;i++){
-particles.push(new Particle());
-}
-
-function animate(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-particles.forEach(p=>{
-p.update();
-p.draw();
-});
-
-requestAnimationFrame(animate);
-}
-
-animate();
-
-/* SCROLL REVEAL */
-
-const cards=document.querySelectorAll(".card");
-
-window.addEventListener("scroll",()=>{
-
-cards.forEach(card=>{
-
-const top=card.getBoundingClientRect().top;
-const trigger=window.innerHeight-100;
-
-if(top<trigger){
-card.classList.add("show");
-}
-
-});
-
-});
-
-</script>
-
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/footer.js"></script>
 </body>
 </html>

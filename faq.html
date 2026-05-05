@@ -1,509 +1,156 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TiffinGenie FAQ | Everything You Need to Know</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .faq-hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: radial-gradient(circle at top, rgba(255, 122, 162, 0.05), transparent);
+            position: relative;
+            overflow: hidden;
+        }
 
-<title>TiffinGenie FAQ</title>
+        .faq-hero h1 {
+            font-size: 52px;
+            font-family: 'Fredoka', sans-serif;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto 100px;
+            padding: 0 20px;
+        }
 
-<style>
+        .faq-item {
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+            transition: 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
+        .faq-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 122, 162, 0.08);
+            border-color: rgba(255, 122, 162, 0.2);
+        }
 
-body{
-font-family:'Poppins',sans-serif;
-background:linear-gradient(135deg,#ffeaf3,#e9f6ff);
-color:#333;
-overflow-x:hidden;
-}
+        .faq-question {
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 18px;
+            color: #111827;
+            transition: 0.2s;
+        }
 
-/* NAVBAR */
+        .faq-question:hover { color: #ff7aa2; }
 
-nav{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:20px 8%;
-background:white;
-box-shadow:0 3px 15px rgba(0,0,0,0.05);
-}
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            background: #fafafa;
+        }
 
-nav h1{
-font-family:'Fredoka',sans-serif;
-color:#ff7aa2;
-}
+        .faq-answer p {
+            padding: 0 30px 30px;
+            color: #6b7280;
+            line-height: 1.8;
+            font-size: 16px;
+        }
 
-nav ul{
-display:flex;
-gap:25px;
-list-style:none;
-}
+        .faq-item.active .faq-answer { max-height: 500px; }
+        .faq-item.active .icon { transform: rotate(180deg); color: #ff7aa2; }
 
-nav a{
-text-decoration:none;
-color:#444;
-font-weight:500;
-}
+        .icon {
+            font-size: 20px;
+            color: #9ca3af;
+            transition: 0.3s;
+        }
 
-nav a:hover{
-color:#ff7aa2;
-}
+        /* Floating Food Icons */
+        .food-icon {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            opacity: 0.2;
+            pointer-events: none;
+            animation: float 6s infinite ease-in-out;
+        }
 
-/* HERO */
-
-.hero{
-text-align:center;
-padding:80px 20px;
-position:relative;
-}
-
-.hero h2{
-font-size:48px;
-font-family:'Fredoka',sans-serif;
-background:linear-gradient(90deg,#ff7aa2,#6aa9ff);
--webkit-background-clip:text;
-color:transparent;
-animation:gradientMove 6s linear infinite;
-}
-
-@keyframes gradientMove{
-0%{background-position:0%}
-100%{background-position:300%}
-}
-
-.hero p{
-margin-top:15px;
-font-size:18px;
-color:#555;
-max-width:600px;
-margin-left:auto;
-margin-right:auto;
-}
-
-/* FLOATING FOOD STICKERS */
-
-.food{
-position:absolute;
-animation:float 6s infinite ease-in-out;
-}
-
-.food img{
-width:60px;
-}
-
-.food1{top:20%;left:10%;}
-.food2{top:25%;right:10%;}
-.food3{bottom:10%;left:15%;}
-.food4{bottom:15%;right:20%;}
-
-@keyframes float{
-0%{transform:translateY(0) rotate(0deg)}
-50%{transform:translateY(-20px) rotate(8deg)}
-100%{transform:translateY(0) rotate(0deg)}
-}
-
-/* FAQ CONTAINER */
-
-.faq-container{
-max-width:850px;
-margin:auto;
-padding:40px 20px;
-}
-
-/* FAQ ITEM */
-
-.faq-item{
-background:white;
-margin-bottom:15px;
-border-radius:12px;
-box-shadow:0 5px 15px rgba(0,0,0,0.05);
-overflow:hidden;
-transition:0.3s;
-}
-
-.faq-question{
-padding:18px 20px;
-font-weight:500;
-cursor:pointer;
-display:flex;
-justify-content:space-between;
-align-items:center;
-font-size:16px;
-}
-
-.faq-question:hover{
-background:#fdf3f7;
-}
-
-.faq-answer{
-max-height:0;
-overflow:hidden;
-padding:0 20px;
-background:white;
-transition:max-height 0.4s ease;
-}
-
-.faq-answer p{
-padding:15px 0;
-color:#555;
-}
-
-/* ICON */
-
-.icon{
-font-size:22px;
-color:#ff7aa2;
-transition:0.3s;
-}
-
-/* FOOTER */
-
-.footer{
-background:linear-gradient(135deg,#ff6fa5,#6aa9ff);
-color:white;
-padding:50px 10% 20px;
-margin-top:60px;
-}
-
-.footer-container{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:30px;
-}
-
-.footer-box h2{
-margin-bottom:10px;
-}
-
-.footer-box h3{
-margin-bottom:10px;
-}
-
-.footer-box p{
-font-size:14px;
-line-height:1.6;
-}
-
-.footer-box ul{
-list-style:none;
-}
-
-.footer-box ul li{
-margin:8px 0;
-}
-
-.footer-box ul li a{
-text-decoration:none;
-color:white;
-transition:0.3s;
-}
-
-.footer-box ul li a:hover{
-padding-left:5px;
-}
-
-.social a{
-font-size:22px;
-margin-right:10px;
-transition:0.3s;
-display:inline-block;
-}
-
-.social a:hover{
-transform:scale(1.3);
-}
-
-.footer-bottom{
-text-align:center;
-margin-top:30px;
-border-top:1px solid rgba(255,255,255,0.3);
-padding-top:15px;
-font-size:14px;
-}
-
-/* MOBILE */
-@media(max-width:768px){
-.footer{
-text-align:center;
-}
-}
-</style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- NAVBAR -->
-
-<nav style="display:flex; justify-content:space-between; align-items:center; padding:15px 5%; background:white; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-  <div style="flex:1;">
-    <h2 onclick="window.location.href='index.html'" style="font-family:'Fredoka', sans-serif; color:#ff7aa2; cursor:pointer; margin:0; font-size:24px;">TiffinGenie</h2>
-  </div>
-
-  <div style="flex:2; display:flex; justify-content:center;">
-    <ul style="display:flex; gap:25px; list-style:none; padding:0; margin:0;">
-      <li><a href="index.html" style="color:#444; font-weight:500; text-decoration:none;">Home</a></li>
-      <li><a href="about.html" style="color:#444; font-weight:500; text-decoration:none;">About Us</a></li>
-      <li><a href="pricing.html" style="color:#444; font-weight:500; text-decoration:none;">Pricing</a></li>
-      <li><a href="how-it-works.html" style="color:#444; font-weight:500; text-decoration:none;">How It Works</a></li>
-      <li><a href="dashboard.html" style="color:#444; font-weight:500; text-decoration:none;">Dashboard</a></li>
-      <li><a href="contact.html" style="color:#444; font-weight:500; text-decoration:none;">Contact</a></li>
-    </ul>
-  </div>
-
-  <div id="navUserSection" style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:15px; min-width:240px;">
-    <!-- JS Session dynamically injects identity states here -->
-    <a href="login.html" style="color:#6aa9ff; font-weight:600; text-decoration:none;">Login</a>
-    <a href="onboarding.html" class="btn" style="padding:10px 20px; background:linear-gradient(45deg,#ff7aa2,#ff4d88); color:white; border-radius:20px; text-decoration:none; font-weight:600;">Get Started</a>
-  </div>
-</nav>
-
-<!-- HERO -->
-
-<section class="hero">
-
-<div class="food food1">
-<img src="https://cdn-icons-png.flaticon.com/512/135/135620.png">
-</div>
-
-<div class="food food2">
-<img src="https://cdn-icons-png.flaticon.com/512/415/415733.png">
-</div>
-
-<div class="food food3">
-<img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
-</div>
-
-<div class="food food4">
-<img src="https://cdn-icons-png.flaticon.com/512/590/590685.png">
-</div>
-
-<h2>Frequently Asked Questions</h2>
-
-<p>Find answers to common questions about TiffinGenie and how it helps parents plan healthy school lunches.</p>
-
-</section>
-
-<!-- FAQ SECTION -->
-
-<section class="faq-container">
-
-<div class="faq-item">
-<div class="faq-question">
-What is TiffinGenie?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>TiffinGenie is a personalized nutrition planning platform designed to help parents prepare healthy school tiffins for their children.</p>
-</div>
-</div>
-
-<div class="faq-item">
-<div class="faq-question">
-How does personalization work?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>Parents add child details such as age, height, weight, food preferences, and allergies. The system then generates suitable meal plans.</p>
-</div>
-</div>
-
-<div class="faq-item">
-<div class="faq-question">
-Is the nutrition information reliable?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>The platform is designed with guidance from pediatric dietitians to ensure accurate and healthy meal recommendations.</p>
-</div>
-</div>
-
-<div class="faq-item">
-<div class="faq-question">
-Can I customize the meal suggestions?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>Yes. Parents can modify meal suggestions and menus based on their child’s taste preferences or dietary needs.</p>
-</div>
-</div>
-
-<div class="faq-item">
-<div class="faq-question">
-Is my child’s data safe?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>Yes. User information is securely stored and used only for personalization and improving the nutrition planning experience.</p>
-</div>
-</div>
-
-</section>
-
-<!-- FOOTER -->
-
-<footer>
-
-<p>© 2026 TiffinGenie</p>
-
-<script>
-
-/* ACCORDION FAQ */
-
-const questions=document.querySelectorAll(".faq-question");
-
-questions.forEach(q=>{
-
-q.addEventListener("click",()=>{
-
-const answer=q.nextElementSibling;
-const icon=q.querySelector(".icon");
-
-if(answer.style.maxHeight){
-
-answer.style.maxHeight=null;
-icon.textContent="+";
-
-}else{
-
-document.querySelectorAll(".faq-answer").forEach(a=>a.style.maxHeight=null);
-document.querySelectorAll(".icon").forEach(i=>i.textContent="+");
-
-answer.style.maxHeight=answer.scrollHeight+"px";
-icon.textContent="-";
-
-}
-</nav>
-
-<!-- HERO -->
-
-<section class="hero">
-
-<div class="food food1">
-<img src="https://cdn-icons-png.flaticon.com/512/135/135620.png">
-</div>
-
-<div class="food food2">
-<img src="https://cdn-icons-png.flaticon.com/512/415/415733.png">
-</div>
-
-<div class="food food3">
-<img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png">
-</div>
-
-<div class="food food4">
-<img src="https://cdn-icons-png.flaticon.com/512/590/590685.png">
-</div>
-
-<h2>Frequently Asked Questions</h2>
-
-<p>Find answers to common questions about TiffinGenie and how it helps parents plan healthy school lunches.</p>
-
-</section>
-
-<!-- FAQ SECTION -->
-
-<section class="faq-container">
-
-<div class="faq-item">
-<div class="faq-question">
-What is TiffinGenie?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>TiffinGenie is a personalized nutrition planning platform designed to help parents prepare healthy school tiffins for their children.</p>
-</div>
-</div>
-
-<div class="faq-item">
-<div class="faq-question">
-How does personalization work?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>Parents add child details such as age, height, weight, food preferences, and allergies. The system then generates suitable meal plans.</p>
-</div>
-</div>
-
-<div class="faq-item">
-<div class="faq-question">
-Is the nutrition information reliable?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>The platform is designed with guidance from pediatric dietitians to ensure accurate and healthy meal recommendations.</p>
-</div>
-</div>
-
-<div class="faq-item">
-<div class="faq-question">
-Can I customize the meal suggestions?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>Yes. Parents can modify meal suggestions and menus based on their child’s taste preferences or dietary needs.</p>
-</div>
-</div>
-
-<div class="faq-item">
-<div class="faq-question">
-Is my child’s data safe?
-<span class="icon">+</span>
-</div>
-<div class="faq-answer">
-<p>Yes. User information is securely stored and used only for personalization and improving the nutrition planning experience.</p>
-</div>
-</div>
-
-</section>
-
-<!-- FOOTER -->
-
-<footer>
-
-<p>© 2026 TiffinGenie</p>
-
-<script>
-
-/* ACCORDION FAQ */
-
-const questions=document.querySelectorAll(".faq-question");
-
-questions.forEach(q=>{
-
-q.addEventListener("click",()=>{
-
-const answer=q.nextElementSibling;
-const icon=q.querySelector(".icon");
-
-if(answer.style.maxHeight){
-
-answer.style.maxHeight=null;
-icon.textContent="+";
-
-}else{
-
-document.querySelectorAll(".faq-answer").forEach(a=>a.style.maxHeight=null);
-document.querySelectorAll(".icon").forEach(i=>i.textContent="+");
-
-answer.style.maxHeight=answer.scrollHeight+"px";
-icon.textContent="-";
-
-}
-
-});
-
-});
-
-</script>
+    <div id="navbar-placeholder"></div>
+
+    <section class="faq-hero">
+        <img src="https://cdn-icons-png.flaticon.com/512/3448/3448316.png" class="food-icon" style="top: 20%; left: 10%;">
+        <img src="https://cdn-icons-png.flaticon.com/512/2927/2927347.png" class="food-icon" style="top: 15%; right: 15%; animation-delay: 2s;">
+        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046788.png" class="food-icon" style="bottom: 20%; left: 15%; animation-delay: 4s;">
+        
+        <h1>Frequently Asked Questions</h1>
+        <p style="color: #6b7280; font-size: 18px; max-width: 600px; margin: 0 auto;">Find answers to common questions about TiffinGenie and how it helps parents plan healthy school lunches.</p>
+    </section>
+
+    <div class="faq-container">
+        <div class="faq-item">
+            <div class="faq-question">What is TiffinGenie? <span class="icon">▼</span></div>
+            <div class="faq-answer"><p>TiffinGenie is a personalized nutrition planning platform designed to help parents prepare healthy school tiffins for their children using real-world recipes and smart AI insights.</p></div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">How does personalization work? <span class="icon">▼</span></div>
+            <div class="faq-answer"><p>When you start, you provide details like your child's age, dietary preferences (Veg/Non-Veg), and allergies. Our AI engine then curates a weekly plan that balances variety with nutrition.</p></div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">Can I swap meals if I don't like a suggestion? <span class="icon">▼</span></div>
+            <div class="faq-answer"><p>Yes! Every meal in your plan can be "swapped" for a similar alternative. The Genie also learns from your choices to improve future suggestions.</p></div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">Is the data safe? <span class="icon">▼</span></div>
+            <div class="faq-answer"><p>Absolutely. Your child's profile and your meal preferences are stored securely. We do not share your personal data with third parties.</p></div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">Is there a mobile app? <span class="icon">▼</span></div>
+            <div class="faq-answer"><p>TiffinGenie is a Progressive Web App (PWA), which means you can "Add to Home Screen" from your mobile browser and it will function just like an app!</p></div>
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
     <script src="js/session.js"></script>
-    <script src="js/meals_db.js"></script>
     <script src="js/assistant.js"></script>
+    <script src="js/footer.js"></script>
+
+    <script>
+        document.querySelectorAll('.faq-question').forEach(q => {
+            q.addEventListener('click', () => {
+                const item = q.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+    </script>
 </body>
 </html>
