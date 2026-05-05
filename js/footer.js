@@ -31,7 +31,7 @@ function injectFooter(isLoggedIn = false) {
                     <h3 style="color: white;">Start your child’s healthy journey</h3>
                     <p style="color: rgba(255,255,255,0.8);">Join parents making nutrition smarter and easier every morning.</p>
                 </div>
-                <a href="onboarding.html" class="btn-primary" style="background: white; color: #ff7aa2; padding: 12px 30px;">Get Started</a>
+                <a href="recipes.html" class="btn-primary" style="background: white; color: #ff7aa2; padding: 12px 30px;">View Recipes</a>
             </div>
         `;
     }
@@ -68,7 +68,7 @@ function injectFooter(isLoggedIn = false) {
                 <h3>Product</h3>
                 <ul>
                     <li><a href="dashboard.html">Dashboard</a></li>
-                    <li><a href="onboarding.html">Get Started</a></li>
+                    <li><a href="recipes.html">View Recipes</a></li>
                     <li><a href="login.html">Login</a></li>
                     <li><a href="contact.html">Support</a></li>
                 </ul>

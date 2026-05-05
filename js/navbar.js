@@ -10,10 +10,10 @@ function injectNavbar() {
                 </div>
                 <ul>
                     <li><a href="index.html" id="nav-home">Home</a></li>
+                    <li><a href="dashboard.html" id="nav-dashboard">Dashboard</a></li>
                     <li><a href="about.html" id="nav-about">About Us</a></li>
                     <li><a href="how-it-works.html" id="nav-how">How It Works</a></li>
                     <li><a href="pricing.html" id="nav-pricing">Pricing</a></li>
-                    <li><a href="dashboard.html" id="nav-dashboard">Dashboard</a></li>
                     <li><a href="contact.html" id="nav-contact">Contact</a></li>
                 </ul>
                 <div id="navUserSection"></div>

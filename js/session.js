@@ -154,7 +154,7 @@ async function initSession() {
     function renderGuestUI() {
         userPanel.innerHTML = `
             <a href="login.html" class="nav-link-secondary">Login</a>
-            <a href="onboarding.html" class="nav-btn nav-btn-primary">Get Started</a>
+            <a href="recipes.html" class="nav-btn nav-btn-primary">View Recipes</a>
         `;
     }
 }
