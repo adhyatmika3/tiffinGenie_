@@ -5,16 +5,13 @@ window.secureFetch = async (url, options = {}) => {
         'Content-Type': 'application/json',
         ...(options.headers || {})
     };
-
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
-
     const fetchOptions = {
         ...options,
         headers
     };
-
     try {
         return await fetch(url, fetchOptions);
     } catch (err) {
@@ -23,10 +20,12 @@ window.secureFetch = async (url, options = {}) => {
     }
 };
 
+let userPanel; // Globally accessible within session.js
+
 // Session Management & Auth State Handler
 async function initSession() {
     // Wait for Navbar to be injected by navbar.js
-    let userPanel = document.getElementById("navUserSection");
+    userPanel = document.getElementById("navUserSection");
     
     // Poll for navbar injection if not immediately available
     let attempts = 0;
@@ -109,9 +108,15 @@ async function initSession() {
 
                 <!-- User Dropdown -->
                 <div class="user-dropdown-container" style="position:relative;">
-                    <button onclick="toggleUserDropdown()" style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #e5e7eb; padding:8px 16px; border-radius:50px; cursor:pointer; font-family:'Poppins'; font-size:14px; color:#374151; transition:0.2s;" onmouseover="this.style.borderColor='#ff7aa2'">
-                        <span>👋 Hi, ${name}</span>
-                        <span style="font-size:10px;">▼</span>
+                    <button onclick="toggleUserDropdown()" style="display:flex; align-items:center; gap:10px; background:#fff; border:1px solid #e5e7eb; padding:6px 14px; border-radius:50px; cursor:pointer; font-family:'Poppins'; font-size:14px; color:#374151; transition:0.2s; box-shadow:0 2px 5px rgba(0,0,0,0.03);" onmouseover="this.style.borderColor='#ff7aa2'; this.style.background='#fff0f5'">
+                        <div style="width:32px; height:32px; background:var(--primary-gradient); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:14px; box-shadow:0 3px 8px rgba(255,122,162,0.3);">
+                            ${name.charAt(0).toUpperCase()}
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1.2;">
+                            <span style="font-size:10px; color:#9ca3af; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Parent Account</span>
+                            <span style="font-weight:600; color:#111827;">Hi, ${name}</span>
+                        </div>
+                        <span style="font-size:10px; color:#9ca3af; margin-left:4px;">▼</span>
                     </button>
                     <div id="navUserDropdown" style="display:none; position:absolute; top:45px; right:0; background:#fff; min-width:220px; border-radius:18px; box-shadow:0 15px 40px rgba(0,0,0,0.12); border:1px solid #f0f0f0; overflow:hidden; z-index:10000; padding:10px 0;">
                         <a href="dashboard.html" class="dropdown-item">📊 My Dashboard</a>
