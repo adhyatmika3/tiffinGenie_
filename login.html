@@ -111,18 +111,47 @@
                         if (data.token) {
                             localStorage.setItem("token", data.token);
                             localStorage.setItem("user", JSON.stringify({
-                                name: data.name, email: data.email, _id: data._id
+                                name: data.name || name, email: data.email, _id: data._id
                             }));
+                            
+                            // ── NEW: Try fetching child profile ──
+                            fetch("http://localhost:5000/api/child/" + data._id, {
+                                headers: { "Authorization": "Bearer " + data.token }
+                            })
+                            .then(function(r) { return r.json(); })
+                            .then(function(profileData) {
+                                if (profileData && profileData.name) {
+                                    // Map backend keys to our userProfile keys
+                                    var profile = {
+                                        parentName: data.name || name,
+                                        email: data.email,
+                                        childName: profileData.name,
+                                        age: profileData.age,
+                                        diet: profileData.diet,
+                                        cuisine: profileData.cuisine || "indian_veg",
+                                        allergies: profileData.allergies || []
+                                    };
+                                    localStorage.setItem("userProfile", JSON.stringify(profile));
+                                    window.location.href = "dashboard.html"; // Success!
+                                } else {
+                                    window.location.href = "onboarding.html";
+                                }
+                            })
+                            .catch(function() {
+                                window.location.href = "onboarding.html";
+                            });
                         }
                     }).catch(function() {
-                        console.warn("[LOGIN] Backend not available");
+                        console.warn("[LOGIN] Backend not available, using fallback");
+                        setTimeout(function() {
+                            window.location.href = destination;
+                        }, 600);
                     });
-                } catch(err) {}
-
-                // Always redirect after 600ms
-                setTimeout(function() {
-                    window.location.href = destination;
-                }, 600);
+                } catch(err) {
+                    setTimeout(function() {
+                        window.location.href = destination;
+                    }, 600);
+                }
             };
 
             console.log("[LOGIN] Ready ✅");
