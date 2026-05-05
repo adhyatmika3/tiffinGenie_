@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | TiffinGenie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus { outline: none; border-color: #ff7aa2; box-shadow: 0 0 0 3px rgba(255,122,162,0.1); }
+        textarea { height: 150px; resize: none; }
+        .help-chip {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #fff;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4b5563;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .help-chip:hover { border-color: #ff7aa2; color: #ff7aa2; background: #fff5f8; }
+        .online-dot {
+            height: 10px;
+            width: 10px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <div class="container" style="max-width: 900px;">
+        <h1 style="text-align: center; font-family: 'Fredoka'; color: #ff7aa2; font-size: 38px;">Need Help with Your Child’s Meals?</h1>
+        <p style="text-align: center; margin-bottom: 50px; color: #6b7280; font-size: 18px;">We’re here to help you plan better, easier meals.</p>
+        
+        <div class="contact-grid">
+            <div class="card">
+                <div style="margin-bottom: 25px;">
+                    <p style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">Quick Help Options:</p>
+                    <div id="quickChips">
+                        <span class="help-chip" onclick="setSubject('Meal Planning Help')">🍱 Meal Planning Help</span>
+                        <span class="help-chip" onclick="setSubject('Nutrition Questions')">🍎 Nutrition Questions</span>
+                        <span class="help-chip" onclick="setSubject('App Issue')">⚙️ App Issue</span>
+                        <span class="help-chip" onclick="setSubject('Feedback')">💬 Feedback</span>
+                    </div>
+                </div>
+                <h3 style="font-family: 'Fredoka'; margin-bottom: 20px;">Send us a Message</h3>
+                <form id="contactFormBlock">
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" id="cName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Email</label>
+                        <input type="email" id="cEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <input type="text" id="cSubj" placeholder="What is this about?">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="cMsg" placeholder="Tell us more..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%; padding: 14px;">Send Message</button>
+                    <p id="contactFeedback" style="margin-top: 15px; font-weight: 500; text-align: center;"></p>
+                </form>
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #f3f4f6; text-align: center;">
+                    <p style="font-size: 13px; color: #6b7280;">👉 <strong>Tip:</strong> You can also use <a href="javascript:void(0)" onclick="toggleAIPanel()" style="color: #ff7aa2; text-decoration: none; font-weight: 600;">Genie Assistant</a> for instant help.</p>
+                </div>
+            </div>
+            
+            <div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="font-family: 'Fredoka'; margin: 0;">Contact Information</h3>
+                        <div style="display: flex; align-items: center; font-size: 12px; color: #10b981; font-weight: 600;">
+                            <span class="online-dot"></span> Online
+                        </div>
+                    </div>
+                    <p style="margin-bottom: 18px; color: #4b5563;">📧 <strong>Email:</strong> support@tiffingenie.com</p>
+                    <p style="margin-bottom: 18px; color: #4b5563;">📞 <strong>Phone:</strong> +91-98765-43210</p>
+                    <p style="margin-bottom: 25px; color: #4b5563;">📍 <strong>Location:</strong> Mumbai, India</p>
+                    
+                    <div style="background: #f9fafb; padding: 15px; border-radius: 12px; border: 1px dashed #d1d5db;">
+                        <p style="font-size: 13px; color: #6b7280; text-align: center; margin: 0;">⚡ Response within <strong>24 hours</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-box">
+                <h2>TiffinGenie</h2>
+                <p>Making healthy eating fun and easy.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 TiffinGenie | Smart Nutrition for a Brighter Future</p>
+        </div>
+    </footer>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/meals_db.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/contact.js"></script>
+</body>
+</html>

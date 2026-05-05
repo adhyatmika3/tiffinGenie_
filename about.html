@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | TiffinGenie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Restored Reference Layout Styles */
+        .about-page {
+            background: linear-gradient(135deg, #ffeaf3 0%, #e9f6ff 100%);
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 80px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section h1 {
+            font-size: 52px;
+            font-family: 'Fredoka', sans-serif;
+            color: #ff7aa2;
+            margin-bottom: 10px;
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Decorative Circles with Interaction */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 122, 162, 0.1);
+            z-index: -1;
+            transition: transform 0.6s ease-out, opacity 0.4s ease;
+        }
+        .circle-left { width: 300px; height: 300px; left: -150px; top: 10%; }
+        .circle-right { width: 250px; height: 250px; right: -120px; bottom: 20%; }
+
+        .hero-section:hover .circle-left { transform: scale(1.1) translate(20px, -10px); opacity: 0.15; }
+        .hero-section:hover .circle-right { transform: scale(1.2) translate(-20px, 10px); opacity: 0.15; }
+
+        .story-section {
+            padding: 60px 20px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .story-section h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 25px;
+            transition: color 0.3s;
+        }
+        .story-section:hover h2 { color: #ff7aa2; }
+
+        .team-section {
+            padding: 60px 20px;
+            max-width: var(--max-width);
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .team-section h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 36px;
+            margin-bottom: 40px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid transparent;
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(255, 122, 162, 0.1);
+            border-color: rgba(255, 122, 162, 0.2);
+        }
+
+        .team-card h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .team-card p {
+            font-size: 14px;
+            color: #ff7aa2;
+            font-weight: 600;
+        }
+
+        .collab-section {
+            padding: 60px 20px 100px;
+            max-width: var(--max-width);
+            margin: 0 auto;
+        }
+
+        .collab-card {
+            background: var(--primary-gradient);
+            background-size: 200% auto;
+            border-radius: 30px;
+            padding: 60px 40px;
+            color: white;
+            text-align: center;
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 30px rgba(255, 122, 162, 0.2);
+        }
+
+        .collab-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(255, 122, 162, 0.3);
+            background-position: right center;
+        }
+
+        .collab-card h2 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .collab-card p {
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 1024px) {
+            .team-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 600px) {
+            .team-grid { grid-template-columns: 1fr; }
+            .hero-section h1 { font-size: 40px; }
+        }
+    </style>
+</head>
+<body class="about-page">
+
+    <div id="navbar-placeholder"></div>
+
+    <section class="hero-section">
+        <div class="circle circle-left"></div>
+        <div class="circle circle-right"></div>
+        <h1>About TiffinGenie</h1>
+        <p>Helping parents plan healthy and happy school tiffins for their children.</p>
+    </section>
+
+    <section class="story-section">
+        <h2>Our Story</h2>
+        <p>TiffinGenie was born from the simple realization that repetitive meals lead to "boring tiffins" and skipped nutrition. Our team came together to build an intelligent engine that understands dietary needs, respects allergies, and ensures variety without any manual effort. We are committed to making healthy eating fun and accessible for every child.</p>
+    </section>
+
+    <section class="team-section">
+        <h2>Our Team</h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <h3>Nada Khokar</h3>
+                <p>Co-Creator</p>
+            </div>
+            <div class="team-card">
+                <h3>Misbah Qureshi</h3>
+                <p>Co-Creator</p>
+            </div>
+            <div class="team-card">
+                <h3>Fatima Sutriwala</h3>
+                <p>Co-Creator</p>
+            </div>
+            <div class="team-card">
+                <h3>Muskan Sayyed</h3>
+                <p>Co-Creator</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="collab-section">
+        <div class="collab-card">
+            <h2>Collaboration</h2>
+            <p>We collaborate with pediatric nutritionists and school health experts to ensure that every recommendation is backed by science. Our goal is to bridge the gap between busy schedules and nutritious meals through technology and expert insights.</p>
+        </div>
+    </section>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/meals_db.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

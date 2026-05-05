@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TiffinGenie | Smart Nutrition for Kids</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            position: relative;
+            overflow-x: hidden;
+        }
+        /* Soft blur circles for visual interest */
+        .bg-circle-1, .bg-circle-2 {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: float 8s ease-in-out infinite alternate;
+        }
+        .bg-circle-1 {
+            width: 400px; height: 400px;
+            background: #ffb6cb;
+            top: -100px; left: -100px;
+        }
+        .bg-circle-2 {
+            width: 500px; height: 500px;
+            background: #dbeafe;
+            top: 200px; right: -150px;
+            animation-delay: 2s;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) translateX(0px); }
+            100% { transform: translateY(30px) translateX(-20px); }
+        }
+
+        .hero {
+            padding: 100px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 56px;
+            line-height: 1.1;
+            background: linear-gradient(90deg, #ff7aa2, #6aa9ff);
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            font-family: 'Fredoka';
+            max-width: 800px;
+        }
+        .hero p {
+            font-size: 20px;
+            color: #4b5563;
+            max-width: 600px;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+        .hero-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-secondary {
+            background: #fff;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+            border-color: #d1d5db;
+            background: #f9fafb;
+            transform: translateY(-2px);
+        }
+
+        /* Mock Preview */
+        .mock-preview {
+            margin-top: 60px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            border: 1px solid #f3f4f6;
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .mock-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 15px;
+            flex: 1;
+            min-width: 140px;
+            text-align: left;
+        }
+        .mock-card h4 { font-family: 'Fredoka'; color: #ff7aa2; font-size: 16px; margin: 0 0 10px 0; }
+        .mock-meal { font-size: 13px; color: #374151; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;}
+        
+        /* Steps */
+        .steps-section {
+            padding: 80px 20px;
+            text-align: center;
+        }
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .step-icon {
+            width: 60px; height: 60px;
+            background: #fff0f5;
+            color: #ff7aa2;
+            border-radius: 16px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(255,122,162,0.1);
+        }
+        .step-item h3 { font-family: 'Fredoka'; font-size: 20px; color: #111827; margin-bottom: 10px; }
+        .step-item p { color: #6b7280; font-size: 15px; }
+
+        /* Value Section */
+        .value-section {
+            background: #fff;
+            border-radius: 30px;
+            padding: 60px 40px;
+            margin: 0 20px 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            border: 1px solid #f3f4f6;
+        }
+        .value-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        .value-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f9fafb;
+            padding: 12px 20px;
+            border-radius: 100px;
+            color: #374151;
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        .cta-section {
+            text-align: center;
+            padding: 40px 20px 100px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-circle-1"></div>
+    <div class="bg-circle-2"></div>
+
+    <div id="navbar-placeholder"></div>
+
+    <div class="container">
+        <!-- 1. HERO SECTION -->
+        <section class="hero">
+            <h1>Plan Healthy Tiffins in Seconds</h1>
+            <p>Personalized meal plans for your child, based on real home food.</p>
+            <div class="hero-btns">
+                <button id="heroCtaBtn" class="btn-primary" style="font-size: 16px; padding: 12px 35px;">Get Started</button>
+                <button class="btn-secondary" onclick="document.getElementById('demoPreview').scrollIntoView({behavior: 'smooth'})">View Demo</button>
+            </div>
+
+            <!-- 5. MINI PREVIEW -->
+            <div id="demoPreview" class="mock-preview">
+                <div class="mock-card">
+                    <h4>Monday</h4>
+                    <div class="mock-meal">🌅 Poha</div>
+                    <div class="mock-meal">☀️ Dal Roti</div>
+                    <div class="mock-meal">🌙 Khichdi</div>
+                </div>
+                <div class="mock-card">
+                    <h4>Tuesday</h4>
+                    <div class="mock-meal">🌅 Idli Sambar</div>
+                    <div class="mock-meal">☀️ Paneer Sabzi</div>
+                    <div class="mock-meal">🌙 Moong Soup</div>
+                </div>
+                <div class="mock-card">
+                    <h4>Wednesday</h4>
+                    <div class="mock-meal">🌅 Aloo Paratha</div>
+                    <div class="mock-meal">☀️ Rajma Chawal</div>
+                    <div class="mock-meal">🌙 Sabzi Roti</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. HOW IT WORKS -->
+        <section class="steps-section">
+            <h2 style="font-family:'Fredoka'; font-size: 32px; color: #111827;">How It Works</h2>
+            <div class="steps-grid">
+                <div class="step-item">
+                    <div class="step-icon">👤</div>
+                    <h3>1. Setup Profile</h3>
+                    <p>Enter your child's age, dietary preferences, and allergies.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon">✨</div>
+                    <h3>2. Get Weekly Plan</h3>
+                    <p>Our intelligent engine instantly creates a balanced 7-day menu.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon">⇄</div>
+                    <h3>3. Customize Easily</h3>
+                    <p>Swap meals instantly or add your own family favorites.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. SHOW REAL VALUE -->
+        <section class="value-section">
+            <h2 style="font-family:'Fredoka'; font-size: 28px; color: #111827; margin: 0;">Why Parents Love This</h2>
+            <div class="value-grid">
+                <div class="value-item"><span>🍲</span> Real home-style meals</div>
+                <div class="value-item"><span>⏱️</span> Saves daily effort</div>
+                <div class="value-item"><span>📅</span> Works with your routine</div>
+            </div>
+        </section>
+
+        <!-- 6. CTA SECTION -->
+        <section class="cta-section">
+            <h2 style="font-family:'Fredoka'; font-size: 36px; color: #111827; margin-bottom: 30px;">Start planning smarter meals today</h2>
+            <button onclick="document.getElementById('heroCtaBtn').click()" class="btn-primary" style="font-size: 16px; padding: 12px 40px;">Get Started</button>
+        </section>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/meals_db.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/footer.js"></script>
+    <script>
+        document.getElementById("heroCtaBtn").addEventListener("click", function() {
+            // Check if user is logged in
+            const profile = localStorage.getItem("userProfile");
+            if (profile) {
+                window.location.href = "dashboard.html";
+            } else {
+                window.location.href = "onboarding.html";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | TiffinGenie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .today-box {
+            background: #fffafa;
+            border: 2px dashed #ffb6cb;
+            padding: 25px;
+            border-radius: 15px;
+        }
+        .meal-tags { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .tag {
+            background: #f0f4f8;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .tag.protein { background: #e3fcef; color: #1f8a53; }
+        .tag.quick { background: #fff4e5; color: #b76e00; }
+        
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        .day-card {
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+        }
+        .day-card h4 {
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #ff7aa2;
+            font-family: 'Fredoka';
+        }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        
+        /* Nutrition Insight Styles */
+        .insight-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #f0f0f0;
+            margin-bottom: 20px;
+        }
+        .insight-bar-bg {
+            background: #f3f4f6;
+            height: 12px;
+            border-radius: 10px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 8px;
+            margin-bottom: 12px;
+        }
+        .insight-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .day-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #4b5563;
+            white-space: nowrap;
+        }
+        .day-tab:hover {
+            background: #f9fafb;
+        }
+        .day-tab.active {
+            background: #ff7aa2;
+            color: #fff;
+            border-color: #ff7aa2;
+        }
+        .insight-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .insight-label {
+            font-weight: 600;
+            font-size: 15px;
+            color: #374151;
+        }
+        .insight-percent {
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .insight-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: -6px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <div class="container">
+        
+        <div id="loadingState" class="card empty-state">
+            <h2>Checking session... ⏳</h2>
+            <p>Please wait while we securely authenticate your profile.</p>
+        </div>
+
+        <div id="emptyState" class="card empty-state" style="display: none;">
+            <h2>🍽️ No Plan Generated Yet</h2>
+            <p style="margin-bottom: 30px;">Your dashboard is empty. Click below to let our intelligent engine create a balanced weekly plan.</p>
+            <button class="btn-primary" onclick="generateFullPlan()">✨ Generate Weekly Plan</button>
+        </div>
+
+        <div id="dashboardContent" style="display: none;">
+            <div class="header-flex">
+                <div>
+                    <h1>Dashboard <span id="childNameTitle" style="color:#6aa9ff; font-size: 24px;"></span></h1>
+                    <p style="color: #6b7280; margin-top: 4px;">Your weekly nutritional workspace.</p>
+                </div>
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <button onclick="openInsightsModal()" style="padding: 12px 20px; border-radius: 12px; border: 1.5px solid #6aa9ff; background: #fff; color: #6aa9ff; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;" onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background='#fff'">
+                        <span>📊</span> Nutrition Insights
+                    </button>
+                    <button onclick="openGroceryModal()" style="padding: 12px 20px; border-radius: 12px; border: 1.5px solid #ff7aa2; background: #fff; color: #ff7aa2; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;" onmouseover="this.style.background='#fff0f5'" onmouseout="this.style.background='#fff'">
+                        <span>🛒</span> View Grocery List
+                    </button>
+                    <button id="generatePlanBtn" onclick="generateFullPlan()" class="btn-primary" style="padding: 12px 25px; display: flex; align-items: center; gap: 8px;">
+                        <span>🔄</span> Generate Weekly Plan
+                    </button>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h3 style="margin: 0; font-family: 'Fredoka'; color: #ff7aa2; font-size: 24px;">📅 Weekly Meal Plan</h3>
+                    <div style="display:flex; gap:15px; align-items:center;">
+                        <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:#374151; cursor:pointer;" title="Prioritize everyday practical meals">
+                            <input type="checkbox" id="realityModeToggle" onchange="toggleRealityMode(this.checked)" style="cursor:pointer; width:16px; height:16px; accent-color:#ff7aa2;">
+                            Simple Home Meals
+                        </label>
+                        <span style="font-size: 13px; color: #e5e7eb;">|</span>
+                        <button onclick="openAddMealModal()" style="padding:8px 16px;border-radius:10px;border:1px solid #e5e7eb;background:#fff;font-size:13px;font-weight:600;color:#374151;cursor:pointer;display:flex;align-items:center;gap:6px;transition:0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='#fff'">➕ Add Meal</button>
+                    </div>
+                </div>
+                <div id="weeklyPlanBox" class="weekly-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD MEAL MODAL -->
+    <div id="addMealModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9999;justify-content:center;align-items:center;">
+        <div style="background:#fff;border-radius:20px;padding:35px;width:100%;max-width:480px;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;">
+                <h3 style="font-family:'Fredoka';font-size:24px;margin:0;color:#333;">➕ Add Custom Meal</h3>
+                <button onclick="closeAddMealModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9ca3af;line-height:1;">×</button>
+            </div>
+
+            <div style="margin-bottom:16px;">
+                <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Meal Name</label>
+                <input id="cmName" type="text" placeholder="e.g. Dal Roti, Poha, Egg Bhurji" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-family:inherit;font-size:14px;box-sizing:border-box;">
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Meal Type</label>
+                    <select id="cmType" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-family:inherit;font-size:14px;">
+                        <option value="breakfast">Breakfast</option>
+                        <option value="lunch">Lunch</option>
+                        <option value="dinner">Dinner</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Cuisine</label>
+                    <select id="cmCuisine" style="width:100%;padding:10px 14px;border:1px solid #e5e7eb;border-radius:10px;font-family:inherit;font-size:14px;">
+                        <option value="indian_veg">Indian Veg</option>
+                        <option value="indian_nonveg">Indian Non-Veg</option>
+                        <option value="mixed">Mixed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-bottom:20px;">
+                <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:10px;">Tags</label>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;">
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" class="cm-tag-check" value="protein"> Protein</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" class="cm-tag-check" value="carbs"> Carbs</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" class="cm-tag-check" value="fiber"> Fiber</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" class="cm-tag-check" value="light"> Light</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" class="cm-tag-check" value="vitamins"> Vitamins</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" class="cm-tag-check" value="iron"> Iron</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" class="cm-tag-check" value="calcium"> Calcium</label>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" class="cm-tag-check" value="energy"> Energy</label>
+                </div>
+            </div>
+
+            <p id="cmFeedback" style="font-size:13px;font-weight:500;margin-bottom:16px;min-height:18px;"></p>
+
+            <div style="display:flex;gap:10px;">
+                <button onclick="saveCustomMeal()" class="btn-primary" style="flex:1;padding:12px;">Save Meal</button>
+                <button onclick="closeAddMealModal()" style="flex:1;padding:12px;border-radius:25px;border:1px solid #e5e7eb;background:#f9fafb;font-weight:600;cursor:pointer;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DAY DETAIL MODAL -->
+    <div id="dayDetailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;justify-content:center;align-items:center;">
+        <div id="dayModalContent" class="modal-box" style="background:#fff;border-radius:22px;padding:30px;width:100%;max-width:500px;margin:20px;box-shadow:0 24px 60px rgba(0,0,0,0.18);max-height:85vh;overflow-y:auto;">
+        </div>
+    </div>
+
+    <!-- GROCERY LIST MODAL -->
+    <div id="groceryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;justify-content:center;align-items:center;">
+        <div class="modal-box" style="background:#fff;border-radius:22px;padding:30px;width:100%;max-width:480px;margin:20px;box-shadow:0 24px 60px rgba(0,0,0,0.18);max-height:85vh;display:flex;flex-direction:column;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-shrink:0;">
+                <h3 style="font-family:'Fredoka';font-size:26px;margin:0;color:#111827;">🛒 Grocery List</h3>
+                <button onclick="closeGroceryModal()" style="background:none;border:none;font-size:26px;cursor:pointer;color:#9ca3af;line-height:1;padding:0;">×</button>
+            </div>
+            <div id="groceryModalContent" style="overflow-y:auto;padding-right:10px;">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- NUTRITION INSIGHTS MODAL -->
+    <div id="insightsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;justify-content:center;align-items:center;">
+        <div class="modal-box" style="background:#fff;border-radius:22px;padding:30px;width:100%;max-width:550px;margin:20px;box-shadow:0 24px 60px rgba(0,0,0,0.18);max-height:85vh;display:flex;flex-direction:column;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-shrink:0;">
+                <h3 style="font-family:'Fredoka';font-size:26px;margin:0;color:#111827;">📊 Nutrition Insights</h3>
+                <button onclick="closeInsightsModal()" style="background:none;border:none;font-size:26px;cursor:pointer;color:#9ca3af;line-height:1;padding:0;">×</button>
+            </div>
+            <div id="insightsModalContent" style="overflow-y:auto;padding-right:10px;">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/meals_db.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>

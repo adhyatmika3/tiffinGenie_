@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TiffinGenie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-family: inherit;
+        }
+        input:focus { outline: none; border-color: #ff7aa2; box-shadow: 0 0 0 3px rgba(255,122,162,0.1); }
+    </style>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <div class="container">
+        <div class="card" style="max-width: 450px; margin: 40px auto;">
+            <h1 style="text-align: center; font-size: 36px;">Welcome Back</h1>
+            <p style="text-align: center; margin-bottom: 40px;">Enter your email to access your dashboard.</p>
+            
+            <form id="loginFormBlock">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                </div>
+                
+                <button type="submit" class="btn-primary" style="width: 100%; font-size: 16px; margin-top: 10px;">Login with Email</button>
+            </form>
+            <p id="loginFeedback" style="text-align: center; margin-top: 20px; font-weight: 500;"></p>
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/meals_db.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/footer.js"></script>
+
+    <script>
+        // INLINE LOGIN LOGIC — guaranteed to execute
+        (function() {
+            console.log("[LOGIN] Inline script running");
+
+            // If profile already exists, go straight to dashboard
+            if (localStorage.getItem("userProfile")) {
+                console.log("[LOGIN] Profile found, redirecting to dashboard");
+                window.location.href = "dashboard.html";
+                return;
+            }
+
+            var form = document.getElementById("loginFormBlock");
+            var feedback = document.getElementById("loginFeedback");
+
+            if (!form) {
+                console.error("[LOGIN] CRITICAL: Form not found!");
+                return;
+            }
+
+            console.log("[LOGIN] Form found, attaching submit handler");
+
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                console.log("[LOGIN] Form submitted!");
+
+                var email = document.getElementById("loginEmail").value.trim().toLowerCase();
+
+                if (!email) {
+                    feedback.innerText = "Please enter your email.";
+                    feedback.style.color = "orange";
+                    return;
+                }
+
+                console.log("[LOGIN] Email:", email);
+
+                // Save email immediately
+                localStorage.setItem("userEmail", email);
+                feedback.innerText = "Welcome! Redirecting... ✅";
+                feedback.style.color = "green";
+
+                // Check if profile exists → dashboard, otherwise → onboarding
+                var profile = localStorage.getItem("userProfile");
+                var destination = profile ? "dashboard.html" : "onboarding.html";
+
+                console.log("[LOGIN] Redirecting to:", destination);
+
+                // Try backend in background (non-blocking)
+                try {
+                    fetch("http://localhost:5000/api/auth/login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email: email })
+                    }).then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data.token) {
+                            localStorage.setItem("token", data.token);
+                            localStorage.setItem("user", JSON.stringify({
+                                name: data.name, email: data.email, _id: data._id
+                            }));
+                        }
+                    }).catch(function() {
+                        console.warn("[LOGIN] Backend not available");
+                    });
+                } catch(err) {}
+
+                // Always redirect after 600ms
+                setTimeout(function() {
+                    window.location.href = destination;
+                }, 600);
+            };
+
+            console.log("[LOGIN] Ready ✅");
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing | TiffinGenie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Anti-Gravity Motion System */
+        .pricing-hero {
+            text-align: center;
+            padding: 80px 0 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Floating Blobs Background */
+        .blob-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            filter: blur(80px);
+            opacity: 0.15;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            animation: move 20s infinite alternate ease-in-out;
+        }
+        .blob-1 { width: 400px; height: 400px; background: #ff7aa2; top: -100px; left: -100px; }
+        .blob-2 { width: 500px; height: 500px; background: #6aa9ff; bottom: -200px; right: -100px; animation-delay: -5s; }
+
+        @keyframes move {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.1); }
+        }
+
+        .pricing-grid {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 40px;
+            padding: 40px 0 100px;
+        }
+
+        /* Anti-Gravity Floating Cards */
+        .price-card {
+            flex: 1;
+            max-width: 380px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 35px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.05);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            animation: floatCard 4s infinite ease-in-out;
+            position: relative;
+        }
+
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .price-card:hover {
+            transform: translateY(-20px) scale(1.03) !important;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.1);
+            background: #ffffff;
+            border-color: rgba(255, 122, 162, 0.3);
+            animation-play-state: paused;
+        }
+
+        /* Premium Highlight */
+        .price-card.premium {
+            border: 2px solid transparent;
+            background-image: linear-gradient(white, white), var(--primary-gradient);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            transform: scale(1.08);
+            animation-delay: -2s;
+            box-shadow: 0 20px 50px rgba(255, 122, 162, 0.15);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-gradient);
+            color: white;
+            padding: 8px 25px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 10px 20px rgba(255,122,162,0.3);
+        }
+
+        .price-tag {
+            font-size: 56px;
+            font-family: 'Fredoka';
+            color: var(--text-dark);
+            margin: 25px 0;
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .price-tag span { font-size: 18px; color: #888; font-family: 'Poppins'; }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0 40px;
+            text-align: left;
+        }
+
+        .feature-list li {
+            margin-bottom: 15px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.3s;
+        }
+
+        .price-card:hover .feature-list li { transform: translateX(5px); }
+
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            background: #e3fcef;
+            color: #1f8a53;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        /* Futuristic Button */
+        .pricing-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-free { background: #f8f9fa; color: #444; border: 1px solid #eee; }
+        .btn-premium { background: var(--primary-gradient); color: white; box-shadow: 0 10px 25px rgba(255,122,162,0.3); }
+
+        .pricing-btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        @media (max-width: 968px) {
+            .pricing-grid { flex-direction: column; align-items: center; gap: 60px; }
+            .price-card.premium { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <div class="pricing-hero">
+        <div class="blob-bg">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+        </div>
+        <h1 style="font-size: 52px; font-family: 'Fredoka';">Pick Your Nutrition Power</h1>
+        <p style="font-size: 18px; color: #666; max-width: 600px; margin: 15px auto;">Simple, transparent pricing for every family. Upgrade anytime to unlock advanced AI insights.</p>
+    </div>
+
+    <div class="container" style="padding-top: 0;">
+        <div class="pricing-grid">
+            
+            <!-- FREE PLAN -->
+            <div class="price-card">
+                <h3>Starter</h3>
+                <div class="price-tag">$0<span>/forever</span></div>
+                <ul class="feature-list">
+                    <li><span class="check-icon">✓</span> 1 Child Profile</li>
+                    <li><span class="check-icon">✓</span> Weekly Meal Generation</li>
+                    <li><span class="check-icon">✓</span> Basic Nutrition Tags</li>
+                    <li><span class="check-icon">✓</span> Offline Access</li>
+                </ul>
+                <a href="onboarding.html" class="pricing-btn btn-free">Get Started</a>
+            </div>
+
+            <!-- PREMIUM PLAN -->
+            <div class="price-card premium">
+                <div class="popular-badge">✨ Most Popular</div>
+                <h3>Pro Plan</h3>
+                <div class="price-tag">$9<span>/month</span></div>
+                <ul class="feature-list">
+                    <li><span class="check-icon">✓</span> <strong>Unlimited</strong> Child Profiles</li>
+                    <li><span class="check-icon">✓</span> <strong>Instant</strong> Meal Refresh</li>
+                    <li><span class="check-icon">✓</span> Detailed Grocery Lists</li>
+                    <li><span class="check-icon">✓</span> Advanced Allergy Guard</li>
+                    <li><span class="check-icon">✓</span> Priority AI Processing</li>
+                </ul>
+                <a href="onboarding.html" class="pricing-btn btn-premium">Unlock Everything</a>
+            </div>
+
+            <!-- FAMILY PLAN -->
+            <div class="price-card">
+                <h3>Family</h3>
+                <div class="price-tag">$19<span>/month</span></div>
+                <ul class="feature-list">
+                    <li><span class="check-icon">✓</span> Up to 5 Child Profiles</li>
+                    <li><span class="check-icon">✓</span> All Pro Features</li>
+                    <li><span class="check-icon">✓</span> Dedicated Support</li>
+                    <li><span class="check-icon">✓</span> Nutritionist Consult</li>
+                </ul>
+                <a href="onboarding.html" class="pricing-btn btn-free">Go Family</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/meals_db.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

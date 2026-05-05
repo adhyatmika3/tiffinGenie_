@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works | TiffinGenie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Premium Motion Design System */
+        .how-hero {
+            text-align: center;
+            padding: 60px 0 40px;
+            background: radial-gradient(circle at top, rgba(255, 122, 162, 0.05), transparent);
+        }
+
+        .how-hero h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Timeline & Step Layout */
+        .timeline-wrapper {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        /* Guided Attention Container */
+        .steps-container:hover .step-row {
+            opacity: 0.6;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
+            transition: opacity 0.35s ease;
+        }
+
+        .step-row:hover {
+            opacity: 1 !important;
+        }
+
+        .step-row:last-child { margin-bottom: 0; }
+        .step-row:nth-child(even) { flex-direction: row-reverse; }
+
+        /* Compact Floating Cards with Motion */
+        .step-card {
+            flex: 1;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-row:hover .step-card {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.08);
+            border-color: rgba(255, 122, 162, 0.4);
+            background: #ffffff;
+        }
+
+        /* Illustration Motion */
+        .step-icon-box {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 90px;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: grayscale(0.2);
+        }
+
+        .step-row:hover .step-icon-box {
+            transform: scale(1.15) translateY(-5px);
+            filter: grayscale(0) drop-shadow(0 15px 25px rgba(255, 122, 162, 0.25));
+        }
+
+        /* Faded Background Numbers */
+        .step-number {
+            position: absolute;
+            top: -20px;
+            right: -10px;
+            font-family: 'Fredoka';
+            font-size: 130px;
+            color: #ff7aa2;
+            opacity: 0.04;
+            pointer-events: none;
+            transition: 0.5s ease;
+        }
+
+        .step-row:hover .step-number {
+            opacity: 0.08;
+            transform: scale(1.1);
+        }
+
+        .feature-chip {
+            display: inline-block;
+            padding: 5px 14px;
+            background: rgba(106, 169, 255, 0.08);
+            color: #4a89df;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .step-card h3 { font-size: 30px; margin-bottom: 12px; font-family: 'Fredoka'; color: var(--text-dark); }
+        .step-card p { font-size: 16px; line-height: 1.6; color: #555; }
+
+        /* Compact Timeline Line */
+        .timeline-track {
+            position: absolute;
+            left: 50%;
+            top: 40px;
+            bottom: 40px;
+            width: 2px;
+            background: linear-gradient(to bottom, #ff7aa2 0%, #6aa9ff 100%);
+            opacity: 0.12;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+
+        @media (max-width: 768px) {
+            .step-row, .step-row:nth-child(even) { flex-direction: column; text-align: center; gap: 40px; }
+            .timeline-track { display: none; }
+            .step-icon-box { font-size: 70px; }
+            .steps-container:hover .step-row { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <div class="container">
+        
+        <header class="how-hero">
+            <h1>How It Works</h1>
+            <p style="font-size: 18px; color: var(--text-light); max-width: 600px; margin: 0 auto;">Healthy tiffins shouldn't be hard. Here's how TiffinGenie simplifies your mornings in 3 intelligent steps.</p>
+        </header>
+
+        <div class="timeline-wrapper">
+            <div class="timeline-track"></div>
+
+            <div class="steps-container">
+                <!-- STEP 1 -->
+                <div class="step-row">
+                    <div class="step-card">
+                        <div class="step-number">01</div>
+                        <span class="feature-chip">Personalize</span>
+                        <h3>Build Profile</h3>
+                        <p>Tell us about your child's age, dietary needs, and any <strong>allergies</strong>. We create a safety-first profile that powers every recommendation.</p>
+                        <div style="margin-top: 20px; display: flex; gap: 15px; color: #777; font-size: 13px; font-weight: 500;">
+                            <span>🔒 Secure Data</span>
+                            <span>•</span>
+                            <span>🛡️ Safety Mesh</span>
+                        </div>
+                    </div>
+                    <div class="step-icon-box">🛡️</div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div class="step-row">
+                    <div class="step-card">
+                        <div class="step-number">02</div>
+                        <span class="feature-chip">AI Engine</span>
+                        <h3>Smart Planning</h3>
+                        <p>Our algorithm scans 40+ recipes to find the perfect mix. It scores meals to ensure **variety** and avoids repeating favorites too often.</p>
+                        <div style="margin-top: 20px; display: flex; gap: 15px; color: #777; font-size: 13px; font-weight: 500;">
+                            <span>🧠 Machine Learning</span>
+                            <span>•</span>
+                            <span>🍱 Zero Boredom</span>
+                        </div>
+                    </div>
+                    <div class="step-icon-box">🧠</div>
+                </div>
+
+                <!-- STEP 3 -->
+                <div class="step-row">
+                    <div class="step-card">
+                        <div class="step-number">03</div>
+                        <span class="feature-chip">Action</span>
+                        <h3>Cook & Serve</h3>
+                        <p>Get a clear dashboard with prep times and <strong>nutrition tags</strong>. Not a fan of a suggestion? Swap it instantly with one click.</p>
+                        <div style="margin-top: 20px; display: flex; gap: 15px; color: #777; font-size: 13px; font-weight: 500;">
+                            <span>⏱️ 15m Average</span>
+                            <span>•</span>
+                            <span>🔄 Instant Swap</span>
+                        </div>
+                    </div>
+                    <div class="step-icon-box">🍱</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/meals_db.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/footer.js"></script>
+</body>
+</html>

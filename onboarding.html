@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Started | TiffinGenie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        input:focus { outline: none; border-color: #ff7aa2; box-shadow: 0 0 0 3px rgba(255,122,162,0.1); }
+    </style>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <div class="container">
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+            <h1 style="text-align: center; font-size: 36px;">Create Profile</h1>
+            <p style="text-align: center; margin-bottom: 40px;">Tell us about your child to generate their first plan.</p>
+            
+            <form id="childProfileForm">
+                <div class="form-group">
+                    <label>Parent Email</label>
+                    <input type="email" id="parentEmail" placeholder="Enter your email" required>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label>Child's Name</label>
+                        <input type="text" id="childName" placeholder="Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Child's Age</label>
+                        <input type="number" id="childAge" placeholder="Age" required min="1" max="18">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Dietary Preference</label>
+                    <select id="childDiet" required>
+                        <option value="veg">Vegetarian</option>
+                        <option value="non-veg">Non-Vegetarian</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Cuisine Preference</label>
+                    <select id="childCuisine" required>
+                        <option value="indian_veg">Indian Vegetarian</option>
+                        <option value="indian_nonveg">Indian Non-Vegetarian</option>
+                        <option value="mixed">Mixed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Allergies (comma separated)</label>
+                    <textarea id="childAllergies" rows="3" placeholder="e.g. peanuts, dairy, gluten"></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width: 100%; font-size: 16px; margin-top: 10px;">✨ Setup Profile</button>
+            </form>
+            <p id="feedbackMessage" style="text-align: center; margin-top: 20px; font-weight: 500;"></p>
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/meals_db.js"></script>
+    <script src="js/assistant.js"></script>
+    <script src="js/footer.js"></script>
+
+    <script>
+        // INLINE ONBOARDING LOGIC — guaranteed to execute
+        (function() {
+            console.log("[ONBOARDING] Inline script running");
+
+            var form = document.getElementById("childProfileForm");
+            var feedback = document.getElementById("feedbackMessage");
+
+            if (!form) {
+                console.error("[ONBOARDING] Form not found!");
+                return;
+            }
+
+            // Pre-fill email from login
+            var savedEmail = localStorage.getItem("userEmail");
+            if (savedEmail) {
+                document.getElementById("parentEmail").value = savedEmail;
+                console.log("[ONBOARDING] Pre-filled email:", savedEmail);
+            }
+
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                console.log("[ONBOARDING] Form submitted!");
+
+                var email = document.getElementById("parentEmail").value.trim().toLowerCase();
+                var childName = document.getElementById("childName").value.trim();
+                var childAge = Number(document.getElementById("childAge").value);
+                var childDiet = document.getElementById("childDiet").value;
+                var rawAllergies = document.getElementById("childAllergies").value;
+                var allergiesArray = rawAllergies ? rawAllergies.split(",").map(function(a) { return a.trim(); }).filter(Boolean) : [];
+                var childCuisine = document.getElementById("childCuisine").value;
+
+                if (!email || !childName || !childAge) {
+                    feedback.innerText = "Please fill all required fields.";
+                    feedback.style.color = "orange";
+                    return;
+                }
+
+                var userProfile = {
+                    email: email,
+                    name: childName,
+                    age: childAge,
+                    diet: childDiet,
+                    cuisine: childCuisine,
+                    allergies: allergiesArray
+                };
+
+                console.log("[ONBOARDING] Profile data:", userProfile);
+
+                // Save to localStorage IMMEDIATELY
+                localStorage.setItem("userEmail", email);
+                localStorage.setItem("userProfile", JSON.stringify(userProfile));
+                console.log("[ONBOARDING] Profile saved to localStorage ✅");
+
+                feedback.innerText = "Profile created! Redirecting to dashboard... ✅";
+                feedback.style.color = "green";
+
+                // Try backend in background (non-blocking)
+                try {
+                    fetch("http://localhost:5000/api/auth/signup", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name: childName, email: email })
+                    }).then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data && data.token) {
+                            localStorage.setItem("token", data.token);
+                            localStorage.setItem("user", JSON.stringify({
+                                name: data.name, email: data.email, _id: data._id
+                            }));
+                            // Try child profile
+                            fetch("http://localhost:5000/api/child", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": "Bearer " + data.token
+                                },
+                                body: JSON.stringify({
+                                    userId: data._id,
+                                    name: childName,
+                                    age: childAge,
+                                    diet: childDiet,
+                                    allergies: allergiesArray
+                                })
+                            }).catch(function() {});
+                        }
+                    }).catch(function() {
+                        console.warn("[ONBOARDING] Backend not available");
+                    });
+                } catch(err) {}
+
+                // Always redirect to dashboard
+                setTimeout(function() {
+                    window.location.href = "dashboard.html";
+                }, 800);
+            };
+
+            console.log("[ONBOARDING] Ready ✅");
+        })();
+    </script>
+</body>
+</html>

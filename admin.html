@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | TiffinGenie</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; background: #f8f9fb; color: #333; }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: white; box-shadow: 0 3px 15px rgba(0,0,0,0.05); }
+nav h1 { font-family: 'Fredoka', sans-serif; color: #ff7aa2; }
+nav a { text-decoration: none; color: #444; font-weight: 500; transition: 0.3s; }
+nav a:hover { color: #ff7aa2; }
+
+.container { padding: 40px 8%; display:flex; gap:30px; }
+.card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); width:100%;}
+.card h2 { color:#6aa9ff; font-family:'Fredoka'; margin-bottom:20px; }
+
+form { display:flex; flex-direction:column; gap:15px; }
+input, select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family:'Poppins'; }
+.btn { padding: 12px; border: none; border-radius: 10px; background: #6aa9ff; color: white; cursor: pointer; transition: 0.3s; font-weight:600;}
+.btn:hover { background: #4a89df; }
+
+table { width:100%; border-collapse: collapse; margin-top:15px;}
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
+th { color: #ff7aa2; font-weight:600; }
+.delete-btn { background: #ff4d88; padding:6px 12px; color:white; border:none; border-radius:5px; cursor:pointer;}
+.delete-btn:hover { background: #d93d70; }
+</style>
+</head>
+<body>
+
+<nav style="display:flex; justify-content:space-between; align-items:center; padding:15px 5%; background:white; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+  <div style="flex:1;">
+    <h2 onclick="window.location.href='index.html'" style="font-family:'Fredoka', sans-serif; color:#ff7aa2; cursor:pointer; margin:0; font-size:24px;">TiffinGenie</h2>
+  </div>
+
+  <div style="flex:2; display:flex; justify-content:center;">
+    <ul style="display:flex; gap:25px; list-style:none; padding:0; margin:0;">
+      <li><a href="index.html" style="color:#444; font-weight:500; text-decoration:none;">Home</a></li>
+      <li><a href="about.html" style="color:#444; font-weight:500; text-decoration:none;">About Us</a></li>
+      <li><a href="pricing.html" style="color:#444; font-weight:500; text-decoration:none;">Pricing</a></li>
+      <li><a href="how-it-works.html" style="color:#444; font-weight:500; text-decoration:none;">How It Works</a></li>
+      <li><a href="dashboard.html" style="color:#444; font-weight:500; text-decoration:none;">Dashboard</a></li>
+      <li><a href="contact.html" style="color:#444; font-weight:500; text-decoration:none;">Contact</a></li>
+    </ul>
+  </div>
+
+  <div id="navUserSection" style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:15px; min-width:240px;">
+    <!-- JS Session dynamically injects identity states here -->
+    <a href="login.html" style="color:#6aa9ff; font-weight:600; text-decoration:none;">Login</a>
+    <a href="onboarding.html" class="btn" style="padding:10px 20px; background:linear-gradient(45deg,#ff7aa2,#ff4d88); color:white; border-radius:20px; text-decoration:none; font-weight:600;">Get Started</a>
+  </div>
+</nav>
+
+<div class="container">
+    
+    <!-- ADD Section -->
+    <div class="card" style="flex:0.4;">
+        <h2>Add New Meal</h2>
+        <form id="addMealForm">
+            <input type="text" id="mName" placeholder="Meal Name (e.g. Sushi)" required>
+            <select id="mType" required>
+                <option value="Main">Main Course</option>
+                <option value="Side">Side Dish</option>
+            </select>
+            <select id="mDiet" required>
+                <option value="veg">Vegetarian</option>
+                <option value="non-veg">Non-Vegetarian</option>
+            </select>
+            <input type="text" id="mIng" placeholder="Tags (comma separated e.g. dairy, egg)">
+            <button type="submit" class="btn">Push to Database</button>
+        </form>
+    </div>
+
+    <!-- VIEW Section -->
+    <div class="card" style="flex:0.6;">
+        <h2>Database Meals</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Diet</th>
+                    <th>Ingredients</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="mealsTableBody">
+                <!-- Javascript Injected -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- FEEDBACK SECTION -->
+<div class="container" style="padding-top:0;">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>📬 User Feedback & Complaints</h2>
+            <button onclick="clearAllFeedback()" style="background:#ff4d88; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-size:12px;">Clear All</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>User</th>
+                    <th>Subject</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="feedbackTableBody">
+                <!-- Javascript Injected -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="js/meals_db.js"></script>
+<script src="js/assistant.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
