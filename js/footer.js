@@ -21,7 +21,7 @@ function injectFooter(isLoggedIn = false) {
                     <h3 style="color: white;">Ready to check today's plan?</h3>
                     <p style="color: #9ca3af;">Your dashboard is updated with the latest nutritional insights.</p>
                 </div>
-                <a href="dashboard.html" class="btn-primary" style="padding: 12px 30px;">Go to Dashboard</a>
+                <a href="dashboard.html" class="btn btn-primary" style="padding: 12px 30px;">Go to Dashboard</a>
             </div>
         `;
     } else {
@@ -31,7 +31,7 @@ function injectFooter(isLoggedIn = false) {
                     <h3 style="color: white;">Start your child’s healthy journey</h3>
                     <p style="color: rgba(255,255,255,0.8);">Join parents making nutrition smarter and easier every morning.</p>
                 </div>
-                <a href="recipes.html" class="btn-primary" style="background: white; color: #ff7aa2; padding: 12px 30px;">View Recipes</a>
+                <a href="recipes.html" class="btn btn-primary" style="background: white; color: #ff7aa2; padding: 12px 30px;">View Recipes</a>
             </div>
         `;
     }

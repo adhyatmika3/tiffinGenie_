@@ -277,7 +277,7 @@ function injectUpgradeModal() {
                 <div style="font-size:60px; margin-bottom:20px;">✨</div>
                 <h2 style="font-family:'Fredoka'; font-size:32px; margin-bottom:10px; color:#111827;">Upgrade to Pro</h2>
                 <p style="color:#6b7280; font-size:16px; margin-bottom:30px; line-height:1.6;"><strong><span id="upgradeModalTitle">This feature</span></strong> is exclusive to our Pro members.</p>
-                <button onclick="triggerProUpgrade()" class="btn-primary" style="width:100%; padding:18px; border-radius:15px; font-weight:700;">Unlock All Pro Features</button>
+                <button onclick="triggerProUpgrade()" class="btn btn-primary" style="width:100%; padding:18px; border-radius:15px; font-weight:700;">Unlock All Pro Features</button>
                 <button onclick="document.getElementById('upgradeModal').style.display='none'" style="background:none; border:none; color:#9ca3af; cursor:pointer; margin-top:15px;">Maybe Later</button>
             </div>
         </div>

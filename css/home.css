@@ -33,12 +33,6 @@ body { overflow-x: hidden; background: #fefefe; }
     font-size: 20px; color: #6b7280; line-height: 1.7; margin-bottom: 36px; max-width: 500px;
 }
 .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
-.hero-cta .btn-primary { padding: 16px 40px; font-size: 17px; border-radius: 50px; box-shadow: 0 12px 30px rgba(255,92,138,0.25); }
-.hero-cta .btn-outline {
-    padding: 16px 34px; border-radius: 50px; font-size: 17px; background: #fff;
-    border: 1.5px solid #e5e7eb; color: #374151; font-weight: 600; cursor: pointer; transition: 0.3s;
-}
-.hero-cta .btn-outline:hover { border-color: #ff7aa2; color: #ff5c8a; transform: translateY(-2px); }
 
 /* ── Dashboard Mockup ── */
 .mockup-wrap {

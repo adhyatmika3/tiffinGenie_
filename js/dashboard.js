@@ -740,7 +740,7 @@ function openInsightsModal() {
             <div style="text-align:center; padding: 40px 20px;">
                 <h3 style="font-family:'Fredoka'; font-size:22px; color:#111827;">No meals planned yet</h3>
                 <p style="color:#6b7280; margin-top:10px;">Generate your weekly plan first to see insights here.</p>
-                <button class="btn-primary" onclick="closeInsightsModal(); generateFullPlan();" style="margin-top:20px; padding:10px 20px;">✨ Generate Now</button>
+                <button class="btn btn-primary" onclick="closeInsightsModal(); generateFullPlan();" style="margin-top:20px; padding:10px 20px;">✨ Generate Now</button>
             </div>
         `;
         document.getElementById("insightsModal").style.display = "flex";
