@@ -57,20 +57,6 @@ function getMealWeight(meal, prefs) {
     // Swapping 3 times reduces weight by 0.9, meaning it's very unlikely to be picked, but never 0.
     var weight = 1.0 + (p.selected * 0.4) - (p.swappedOut * 0.3);
 
-    // Reality Mode: If ON, penalize non-simple meals significantly
-    var profileRaw = localStorage.getItem("userProfile");
-    if (profileRaw) {
-        var profile = JSON.parse(profileRaw);
-        if (profile.realityMode) {
-            var isSimple = (meal.tags || []).indexOf("simple") !== -1 || meal.custom;
-            if (!isSimple) {
-                weight *= 0.1; 
-            } else {
-                weight *= 1.8; // Boosted from 1.5
-            }
-        }
-    }
-
     // Always give custom meals a significant boost so they actually appear in "options"
     if (meal.custom) {
         weight *= 3.0; 
@@ -213,34 +199,6 @@ function renderDashboard(profile, plan) {
             + '</div></div>';
     });
     box.innerHTML = html;
-    updateHealthScoreUI(plan);
-    
-    // Check reminder state
-    var rem = localStorage.getItem("prepRemindersEnabled") === "true";
-    var toggle = document.getElementById("prepReminderToggle");
-    if (toggle) toggle.checked = rem;
-}
-
-// ─── HEALTH SCORE LOGIC ───────────────────────────────────────────────────────
-function updateHealthScoreUI(plan) {
-    var all = [];
-    Object.keys(plan).forEach(function(d) {
-        if (plan[d].breakfast) all.push(plan[d].breakfast);
-        if (plan[d].lunch) all.push(plan[d].lunch);
-        if (plan[d].dinner) all.push(plan[d].dinner);
-    });
-    
-    var stats = calcStats(all);
-    var avg = Math.round((stats.protein + stats.fiber + stats.energy) / 3);
-    
-    var circle = document.getElementById("healthScoreCircle");
-    var text   = document.getElementById("healthScoreText");
-    if (!circle || !text) return;
-
-    circle.innerText = avg;
-    if (avg >= 80) { circle.style.background = "#10b981"; text.innerText = "Excellent"; }
-    else if (avg >= 60) { circle.style.background = "#f59e0b"; text.innerText = "Good"; }
-    else { circle.style.background = "#ef4444"; text.innerText = "Needs Work"; }
 }
 
 // ─── PREP REMINDERS LOGIC ─────────────────────────────────────────────────────
@@ -850,6 +808,7 @@ function openInsightsModal() {
     container.innerHTML = `
         <div class="insight-card">
             <h4 style="font-family:'Fredoka'; font-size:18px; margin:0 0 15px; color:#111827;">Weekly Summary</h4>
+            <div id="modalScoreBox" style="margin-bottom:20px;"></div>
             <div id="weeklyStatsBox"></div>
         </div>
         <div class="insight-card">
@@ -868,7 +827,22 @@ function openInsightsModal() {
             if (plan[d].dinner) all.push(plan[d].dinner);
         }
     });
-    renderInsightsUI("weeklyStatsBox", calcStats(all));
+    var weeklyStats = calcStats(all);
+    renderInsightsUI("weeklyStatsBox", weeklyStats);
+
+    // Render Modal Score
+    var avg = Math.round((weeklyStats.protein + weeklyStats.fiber + weeklyStats.energy) / 3);
+    var sColor = avg >= 80 ? "#10b981" : (avg >= 60 ? "#f59e0b" : "#ef4444");
+    var sText = avg >= 80 ? "Excellent" : (avg >= 60 ? "Good" : "Needs Work");
+    document.getElementById("modalScoreBox").innerHTML = `
+        <div style="display:flex; align-items:center; gap:15px; background:#f9fafb; padding:15px; border-radius:15px; border:1px solid #f0f0f0;">
+            <div style="width:60px; height:60px; border-radius:50%; background:${sColor}; display:flex; align-items:center; justify-content:center; color:#fff; font-size:20px; font-weight:700; font-family:'Fredoka';">${avg}</div>
+            <div>
+                <div style="font-size:12px; color:#9ca3af; font-weight:700; text-transform:uppercase;">Weekly Health Score</div>
+                <div style="font-size:18px; color:#111827; font-weight:600;">${sText}</div>
+            </div>
+        </div>
+    `;
 
     // Daily Tabs
     var tabs = document.getElementById("dayTabs");

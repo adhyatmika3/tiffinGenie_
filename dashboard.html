@@ -166,35 +166,14 @@
                     <p style="color: #6b7280; margin-top: 4px;">Your weekly nutritional workspace.</p>
                 </div>
                 <div style="display:flex; gap:12px; align-items:center;">
-                    <!-- Health Score Widget -->
-                    <div class="health-widget" onclick="openInsightsModal()" style="cursor:pointer;">
-                        <div id="healthScoreCircle" class="score-circle" style="background: #10b981;">85</div>
-                        <div>
-                            <div style="font-size: 10px; font-weight: 700; color: #9ca3af; text-transform: uppercase;">Score</div>
-                            <div id="healthScoreText" style="font-size: 12px; font-weight: 600; color: #111827;">Good</div>
-                        </div>
-                    </div>
-
-                    <!-- Prep Reminder Toggle -->
-                    <div style="display: flex; align-items: center; gap: 8px; background: #fff; padding: 8px 16px; border-radius: 50px; border: 1px solid #f0f0f0;">
-                        <span style="font-size: 12px; font-weight: 500; color: #4b5563;">Prep Alert</span>
-                        <label class="switch">
-                            <input type="checkbox" id="prepReminderToggle" onchange="togglePrepReminders(this.checked)">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
                     <button onclick="openInsightsModal()" style="padding: 12px 20px; border-radius: 12px; border: 1.5px solid #6aa9ff; background: #fff; color: #6aa9ff; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;" onmouseover="this.style.background='#f0f7ff'" onmouseout="this.style.background='#fff'">
-                        <span>📊</span> Insights
+                        <span>📊</span> Nutrition Stats
                     </button>
                     <button onclick="openGroceryModal()" style="padding: 12px 20px; border-radius: 12px; border: 1.5px solid #ff7aa2; background: #fff; color: #ff7aa2; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;" onmouseover="this.style.background='#fff0f5'" onmouseout="this.style.background='#fff'">
-                        <span>🛒</span> View Grocery List
-                    </button>
-                    <button onclick="window.location.href='recipes.html'" style="padding: 12px 20px; border-radius: 12px; border: 1.5px solid #ff7aa2; background: #fff; color: #ff7aa2; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;" onmouseover="this.style.background='#fff0f5'" onmouseout="this.style.background='#fff'">
-                        <span>📖</span> Browse Recipes
+                        <span>🛒</span> Grocery List
                     </button>
                     <button id="generatePlanBtn" onclick="generateFullPlan()" class="btn-primary" style="padding: 12px 25px; display: flex; align-items: center; gap: 8px;">
-                        <span>🔄</span> Generate Weekly Plan
+                        <span>🔄</span> Generate Plan
                     </button>
                 </div>
             </div>
@@ -203,11 +182,6 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                     <h3 style="margin: 0; font-family: 'Fredoka'; color: #ff7aa2; font-size: 24px;">📅 Weekly Meal Plan</h3>
                     <div style="display:flex; gap:15px; align-items:center;">
-                        <label style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:#374151; cursor:pointer;" title="Prioritize everyday practical meals">
-                            <input type="checkbox" id="realityModeToggle" onchange="toggleRealityMode(this.checked)" style="cursor:pointer; width:16px; height:16px; accent-color:#ff7aa2;">
-                            Simple Home Meals
-                        </label>
-                        <span style="font-size: 13px; color: #e5e7eb;">|</span>
                         <button onclick="openAddMealModal()" style="padding:8px 16px;border-radius:10px;border:1px solid #e5e7eb;background:#fff;font-size:13px;font-weight:600;color:#374151;cursor:pointer;display:flex;align-items:center;gap:6px;transition:0.2s;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='#fff'">➕ Add Meal</button>
                     </div>
                 </div>

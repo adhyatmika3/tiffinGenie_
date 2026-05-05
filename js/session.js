@@ -87,18 +87,69 @@ async function initSession() {
 
     function renderAuthUI(name) {
         userPanel.innerHTML = `
-            <div style="display:flex; align-items:center; gap:15px;">
+            <div style="display:flex; align-items:center; gap:15px; position:relative;">
+                <!-- Notification Bell -->
                 <div style="position: relative;">
                     <button onclick="openMessageModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#4b5563; display:flex; align-items:center; justify-content:center; padding:5px; border-radius:50%; transition:0.2s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">
                         🔔
                     </button>
                     <span id="navNotifBadge" style="display:none; position:absolute; top:-2px; right:-2px; background:#ef4444; color:white; border-radius:50%; width:16px; height:16px; font-size:9px; display:flex; justify-content:center; align-items:center; border:2px solid #fff; font-weight:bold;">0</span>
                 </div>
-                <span class="identity-text">👋 Hi, ${name}</span>
-                <a href="#" id="navLogoutBtn" onclick="handleLogout()" class="nav-btn nav-btn-dark">Logout</a>
+
+                <!-- User Dropdown -->
+                <div class="user-dropdown-container" style="position:relative;">
+                    <button onclick="toggleUserDropdown()" style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid #e5e7eb; padding:8px 16px; border-radius:50px; cursor:pointer; font-family:'Poppins'; font-size:14px; color:#374151; transition:0.2s;" onmouseover="this.style.borderColor='#ff7aa2'">
+                        <span>👋 Hi, ${name}</span>
+                        <span style="font-size:10px;">▼</span>
+                    </button>
+                    <div id="navUserDropdown" style="display:none; position:absolute; top:45px; right:0; background:#fff; min-width:220px; border-radius:18px; box-shadow:0 15px 40px rgba(0,0,0,0.12); border:1px solid #f0f0f0; overflow:hidden; z-index:10000; padding:10px 0;">
+                        <a href="dashboard.html" class="dropdown-item">📊 My Dashboard</a>
+                        <a href="recipes.html" class="dropdown-item">📖 Recipe Library</a>
+                        <div style="padding:12px 20px; border-top:1px solid #f9fafb; border-bottom:1px solid #f9fafb; display:flex; align-items:center; justify-content:space-between;">
+                            <span style="font-size:13px; color:#4b5563; font-weight:500;">Prep Alerts</span>
+                            <label class="switch-small">
+                                <input type="checkbox" id="navPrepToggle" onchange="window.togglePrepReminders(this.checked)">
+                                <span class="slider-small"></span>
+                            </label>
+                        </div>
+                        <a href="#" onclick="handleLogout()" class="dropdown-item" style="color:#ef4444;">🚪 Logout</a>
+                    </div>
+                </div>
             </div>
+            <style>
+                .dropdown-item { display:block; padding:12px 20px; font-size:14px; color:#374151; text-decoration:none; transition:0.2s; font-weight:500; }
+                .dropdown-item:hover { background:#fff0f5; color:#ff7aa2; }
+                
+                /* Small Toggle for Dropdown */
+                .switch-small { position: relative; display: inline-block; width: 34px; height: 18px; }
+                .switch-small input { opacity: 0; width: 0; height: 0; }
+                .slider-small { position: absolute; cursor: pointer; inset: 0; background-color: #e5e7eb; transition: .4s; border-radius: 34px; }
+                .slider-small:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+                input:checked + .slider-small { background-color: #ff7aa2; }
+                input:checked + .slider-small:before { transform: translateX(16px); }
+            </style>
         `;
+        
+        // Sync toggle state
+        setTimeout(() => {
+            const rem = localStorage.getItem("prepRemindersEnabled") === "true";
+            const toggle = document.getElementById("navPrepToggle");
+            if (toggle) toggle.checked = rem;
+        }, 100);
     }
+
+    window.toggleUserDropdown = function() {
+        const dd = document.getElementById("navUserDropdown");
+        if (dd) dd.style.display = dd.style.display === "none" ? "block" : "none";
+    };
+
+    // Close dropdown on outside click
+    window.addEventListener("click", function(e) {
+        if (!e.target.closest(".user-dropdown-container")) {
+            const dd = document.getElementById("navUserDropdown");
+            if (dd) dd.style.display = "none";
+        }
+    });
 
     function renderGuestUI() {
         userPanel.innerHTML = `

@@ -252,7 +252,7 @@
                 var isFav = favorites.indexOf(m.name) !== -1;
                 var typeClass = "type-" + m.type;
 
-                var tagsHTML = m.tags.map(function(t) {
+                var tagsHTML = m.tags.filter(t => t !== "simple").map(function(t) {
                     return '<span class="tag-pill">' + t + '</span>';
                 }).join("");
 
