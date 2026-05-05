@@ -29,6 +29,7 @@ function injectNavbar() {
         "how-it-works.html": "nav-how",
         "pricing.html": "nav-pricing",
         "dashboard.html": "nav-dashboard",
+        "recipes.html": "nav-recipes",
         "contact.html": "nav-contact"
     };
 

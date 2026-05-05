@@ -111,63 +111,104 @@ function generateAIResponse(query) {
     
     var cuisine = profile.cuisine || "indian_veg";
     var db      = (typeof MEAL_DB !== 'undefined') ? (MEAL_DB[cuisine] || MEAL_DB["indian_veg"]) : null;
-
     if (!db) return "I'm ready! Just give me a second to sync with your meal database.";
 
-    var negatives = ["don't have", "no", "without", "avoid", "not have"];
+    // 1. GREETING & SMALL TALK DETECTION
+    var greetings = ["hello", "hi", "hii", "hey", "hola", "greetings", "good morning", "good evening"];
+    var isGreeting = greetings.some(g => query === g || query.startsWith(g + " ") || query.endsWith(" " + g));
+    
+    if (isGreeting) {
+        var name = profile.name ? profile.name : "there";
+        return "Hi " + name + "! 👋 How can I help you with your child's meals today? I can suggest recipes, check your plan's balance, or handle dietary constraints.";
+    }
+
+    if (query === "how are you") return "I'm doing great! Just busy thinking about healthy recipes. How can I help you?";
+    if (query.includes("thank") || query.includes("thanks")) return "You're very welcome! I'm always here to help. 😊";
+
+    // 2. CONSTRAINT DETECTION (e.g., "no eggs" or "don't have rice")
+    var newConstraint = null;
+    var negatives = ["don't have", "no", "without", "avoid", "not have", "exclude", "don't want"];
     negatives.forEach(function(neg) {
         if (query.includes(neg)) {
             var parts = query.split(neg);
             if (parts.length > 1) {
                 var item = parts[1].trim().split(" ")[0].replace(/[^a-zA-Z]/g, "");
-                if (item && !assistantState.constraints.includes(item)) assistantState.constraints.push(item);
+                if (item && item.length > 2 && !assistantState.constraints.includes(item)) {
+                    assistantState.constraints.push(item);
+                    newConstraint = item;
+                }
             }
         }
     });
 
-    var isQuick = query.includes("quick") || query.includes("fast") || query.includes("instant") || query.includes("hurry");
-    var isHealthy = query.includes("healthy") || query.includes("balanced") || query.includes("nutrition") || query.includes("protein");
+    // 3. INTENT DETECTION
+    var isQuick = query.includes("quick") || query.includes("fast") || query.includes("instant") || query.includes("hurry") || query.includes("easy");
+    var isHealthy = query.includes("healthy") || query.includes("balanced") || query.includes("nutrition") || query.includes("protein") || query.includes("check");
+    var wantsSuggestion = query.includes("suggest") || query.includes("idea") || query.includes("what to") || query.includes("eat") || query.includes("meal") || query.includes("recipe") || query.includes("give me");
+
+    // Detect Meal Type
+    var hasSpecificType = false;
+    if (query.includes("breakfast")) { assistantState.lastType = "breakfast"; hasSpecificType = true; }
+    else if (query.includes("lunch")) { assistantState.lastType = "lunch"; hasSpecificType = true; }
+    else if (query.includes("dinner")) { assistantState.lastType = "dinner"; hasSpecificType = true; }
     
     var type = assistantState.lastType;
-    if (query.includes("breakfast")) type = "breakfast";
-    if (query.includes("lunch")) type = "lunch";
-    if (query.includes("dinner")) type = "dinner";
-    assistantState.lastType = type;
 
-    if (isHealthy && (query.includes("plan") || query.includes("my meals") || query.includes("check"))) {
+    // 4. RESPONSE LOGIC
+
+    // Case A: Nutrition / Balance Check
+    if (isHealthy && (query.includes("plan") || query.includes("my meals") || query.includes("is my") || query.includes("check"))) {
         if (!plan) return "I need a plan to analyze first! Go ahead and 'Generate' one on the dashboard.";
         var pCount = 0, total = 0;
         Object.keys(plan).forEach(d => {
             ["breakfast", "lunch", "dinner"].forEach(t => {
-                if (plan[d][t]) { total++; if (plan[d][t].tags.join("").toLowerCase().includes("protein")) pCount++; }
+                if (plan[d][t]) { 
+                    total++; 
+                    var tags = plan[d][t].tags ? plan[d][t].tags.join("").toLowerCase() : "";
+                    if (tags.includes("protein")) pCount++; 
+                }
             });
         });
-        var pct = Math.round((pCount / total) * 100);
+        var pct = total > 0 ? Math.round((pCount / total) * 100) : 0;
         return "I've reviewed your plan. You have " + pct + "% protein-rich meals. " + (pct < 35 ? "It's a bit low—try adding some paneer or dal dishes." : "It looks very well-balanced!");
     }
 
-    var pool = (db[type] || []).concat(custom.filter(m => m.type === type));
-    var filtered = pool.filter(function(meal) {
-        var mealText = (meal.name + " " + (meal.tags || []).join(" ")).toLowerCase();
-        var isAllowed = true;
-        assistantState.constraints.forEach(function(c) { if (mealText.includes(c.toLowerCase())) isAllowed = false; });
-        return isAllowed;
-    });
+    // Case B: Meal Suggestion (Explicit, Implicit, or via New Constraint)
+    if (wantsSuggestion || hasSpecificType || newConstraint || isQuick) {
+        var pool = (db[type] || []).concat(custom.filter(m => m.type === type));
+        var filtered = pool.filter(function(meal) {
+            var mealText = (meal.name + " " + (meal.tags || []).join(" ")).toLowerCase();
+            var isAllowed = true;
+            assistantState.constraints.forEach(function(c) { if (mealText.includes(c.toLowerCase())) isAllowed = false; });
+            return isAllowed;
+        });
 
-    if (isQuick) filtered = filtered.filter(m => (m.tags || []).includes("simple") || (m.tags || []).includes("light"));
+        if (isQuick) filtered = filtered.filter(m => (m.tags || []).includes("simple") || (m.tags || []).includes("light"));
 
-    if (filtered.length > 0) {
-        var items = filtered.slice(0, 3).map(m => m.name);
-        var res = "For " + type + ", I'd suggest " + items.join(", ") + ".";
-        if (assistantState.constraints.length > 0) res += " These are all " + assistantState.constraints.join(" and ") + "-free.";
-        if (isQuick) res += " They're also very fast to prepare!";
-        return res;
+        if (filtered.length > 0) {
+            filtered.sort(() => Math.random() - 0.5);
+            var items = filtered.slice(0, 3).map(m => m.name);
+            
+            var prefix = "";
+            if (newConstraint) {
+                prefix = "Got it, no " + newConstraint + "! Let me find alternatives for " + type + ". How about: ";
+            } else {
+                prefix = "For " + type + ", I'd suggest ";
+            }
+
+            var res = prefix + items.join(", ") + ".";
+            if (assistantState.constraints.length > 0 && !newConstraint) res += " These are all " + assistantState.constraints.join(" and ") + "-free.";
+            return res;
+        }
+
+        if (assistantState.constraints.length > 0) {
+            return "I'm having trouble finding " + type + " without " + assistantState.constraints.join("/") + ". Should we try a different meal type?";
+        }
     }
 
-    if (assistantState.constraints.length > 0) return "I'm having trouble finding " + type + " without " + assistantState.constraints.join("/") + ". Maybe try a simple " + (cuisine.includes("veg") ? "Dal Rice" : "Egg-free Poha") + " instead?";
-    return "I can help with that! Are you looking for a quick " + type + " idea, or should I check if your current plan is balanced?";
+    // Default Fallback
+    return "I'm not sure I understood perfectly. Are you looking for a meal idea (like 'Suggest a quick dinner'), or should I check if your current plan is balanced?";
 }
 
 // Automatically inject on load
 document.addEventListener("DOMContentLoaded", injectAssistant);
-

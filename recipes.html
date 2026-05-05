@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genie Kitchen | TiffinGenie</title>
+    <meta name="description" content="Browse our entire library of healthy, child-approved recipes. Favorite meals to prioritize them in your weekly plan.">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .recipe-hero {
+            padding-top: 120px;
+            padding-bottom: 40px;
+        }
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            background: #fff;
+            padding: 18px;
+            border-radius: 18px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            align-items: center;
+        }
+        .filter-select {
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            min-width: 140px;
+            background: #fff;
+        }
+        .filter-select:focus { border-color: #ff7aa2; }
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+        .search-input:focus { border-color: #ff7aa2; }
+        .fav-filter-btn {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: 1px solid #ff7aa2;
+            background: #fff;
+            color: #ff7aa2;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .fav-filter-btn.active, .fav-filter-btn:hover {
+            background: #ff7aa2;
+            color: #fff;
+        }
+        .recipe-count {
+            font-size: 13px;
+            color: #9ca3af;
+            font-weight: 500;
+            margin-left: auto;
+        }
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 22px;
+            padding-bottom: 60px;
+        }
+        .recipe-card {
+            background: #fff;
+            border-radius: 22px;
+            padding: 24px;
+            border: 1px solid #f0f0f0;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .recipe-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.07);
+        }
+        .heart-btn {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            background: #fff0f5;
+            color: #ff7aa2;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            transition: 0.2s;
+            box-shadow: 0 3px 10px rgba(255,122,162,0.12);
+        }
+        .heart-btn:hover { transform: scale(1.15); }
+        .heart-btn.active {
+            background: #ff7aa2;
+            color: #fff;
+        }
+        .type-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+        .type-breakfast { background: #fef3c7; color: #92400e; }
+        .type-lunch { background: #d1fae5; color: #065f46; }
+        .type-dinner { background: #e0e7ff; color: #3730a3; }
+        .recipe-title {
+            font-family: 'Fredoka';
+            font-size: 20px;
+            color: #111827;
+            margin: 0 0 10px 0;
+            line-height: 1.3;
+        }
+        .tag-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: #f3f4f6;
+            color: #4b5563;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+        .recipe-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+            color: #9ca3af;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="navbar-placeholder"></div>
+
+    <main class="container recipe-hero">
+        <div style="margin-bottom: 35px;">
+            <h1 style="font-family: 'Fredoka'; font-size: 40px; margin: 0; color: #111827;">
+                Genie's <span style="color: #ff7aa2;">Kitchen</span>
+            </h1>
+            <p style="color: #6b7280; font-size: 16px; margin-top: 8px;">
+                Browse all recipes. Heart your favourites — Genie will prioritise them in your weekly plan!
+            </p>
+        </div>
+
+        <div class="filter-bar">
+            <select id="typeFilter" class="filter-select" onchange="applyFilters()">
+                <option value="all">All Types</option>
+                <option value="breakfast">🌅 Breakfast</option>
+                <option value="lunch">☀️ Lunch</option>
+                <option value="dinner">🌙 Dinner</option>
+            </select>
+            <select id="tagFilter" class="filter-select" onchange="applyFilters()">
+                <option value="all">All Tags</option>
+                <option value="protein">💪 Protein</option>
+                <option value="fiber">🥗 Fiber</option>
+                <option value="energy">⚡ Energy</option>
+                <option value="simple">🏠 Simple</option>
+                <option value="light">🍃 Light</option>
+            </select>
+            <input type="text" id="recipeSearch" class="search-input"
+                   placeholder="Search recipes…" oninput="applyFilters()">
+            <button id="favFilterBtn" class="fav-filter-btn" onclick="toggleFavFilter()">❤️ Favourites</button>
+            <span id="recipeCount" class="recipe-count"></span>
+        </div>
+
+        <div id="recipeGrid" class="recipe-grid"></div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="js/meals_db.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/footer.js"></script>
+    <script src="js/assistant.js"></script>
+    <script>
+    (function() {
+        var favorites = JSON.parse(localStorage.getItem("mealFavorites") || "[]");
+        var showFavsOnly = false;
+
+        function buildFullPool() {
+            var pool = [];
+            var seen = {};
+            Object.keys(MEAL_DB).forEach(function(cuisine) {
+                ["breakfast", "lunch", "dinner"].forEach(function(type) {
+                    (MEAL_DB[cuisine][type] || []).forEach(function(m) {
+                        var key = m.name.toLowerCase();
+                        if (!seen[key]) {
+                            seen[key] = true;
+                            pool.push({
+                                name: m.name,
+                                tags: m.tags || [],
+                                type: type,
+                                cuisine: cuisine,
+                                custom: false
+                            });
+                        }
+                    });
+                });
+            });
+
+            // Add custom meals
+            var custom = JSON.parse(localStorage.getItem("customMeals") || "[]");
+            custom.forEach(function(m) {
+                var key = m.name.toLowerCase();
+                if (!seen[key]) {
+                    seen[key] = true;
+                    pool.push({
+                        name: m.name,
+                        tags: m.tags || [],
+                        type: m.type,
+                        cuisine: m.cuisine,
+                        custom: true
+                    });
+                }
+            });
+
+            return pool;
+        }
+
+        function renderCards(list) {
+            var grid = document.getElementById("recipeGrid");
+            var countEl = document.getElementById("recipeCount");
+            countEl.textContent = list.length + " recipe" + (list.length !== 1 ? "s" : "");
+
+            if (list.length === 0) {
+                grid.innerHTML = '<div class="recipe-empty">No recipes match your filters. Try broadening your search!</div>';
+                return;
+            }
+
+            var html = "";
+            list.forEach(function(m) {
+                var isFav = favorites.indexOf(m.name) !== -1;
+                var typeClass = "type-" + m.type;
+
+                var tagsHTML = m.tags.map(function(t) {
+                    return '<span class="tag-pill">' + t + '</span>';
+                }).join("");
+
+                var customBadge = m.custom
+                    ? ' <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#ede9fe;color:#7c3aed;font-weight:700;">Custom</span>'
+                    : "";
+
+                html += '<div class="recipe-card">'
+                    + '<button class="heart-btn ' + (isFav ? "active" : "") + '" '
+                    + 'onclick="window._toggleFav(\'' + m.name.replace(/'/g, "\\'") + '\', this)">'
+                    + (isFav ? "❤️" : "🤍")
+                    + '</button>'
+                    + '<span class="type-badge ' + typeClass + '">' + m.type + '</span>'
+                    + '<h3 class="recipe-title">' + m.name + customBadge + '</h3>'
+                    + '<div>' + tagsHTML + '</div>'
+                    + '</div>';
+            });
+            grid.innerHTML = html;
+        }
+
+        window._toggleFav = function(name, btn) {
+            var idx = favorites.indexOf(name);
+            if (idx === -1) {
+                favorites.push(name);
+                btn.innerHTML = "❤️";
+                btn.classList.add("active");
+            } else {
+                favorites.splice(idx, 1);
+                btn.innerHTML = "🤍";
+                btn.classList.remove("active");
+            }
+            localStorage.setItem("mealFavorites", JSON.stringify(favorites));
+        };
+
+        window.toggleFavFilter = function() {
+            showFavsOnly = !showFavsOnly;
+            var btn = document.getElementById("favFilterBtn");
+            if (showFavsOnly) { btn.classList.add("active"); }
+            else { btn.classList.remove("active"); }
+            applyFilters();
+        };
+
+        window.applyFilters = function() {
+            var typeVal = document.getElementById("typeFilter").value;
+            var tagVal  = document.getElementById("tagFilter").value;
+            var search  = document.getElementById("recipeSearch").value.toLowerCase().trim();
+
+            var pool = buildFullPool();
+
+            var filtered = pool.filter(function(m) {
+                if (typeVal !== "all" && m.type !== typeVal) return false;
+                if (tagVal !== "all" && m.tags.indexOf(tagVal) === -1) return false;
+                if (showFavsOnly && favorites.indexOf(m.name) === -1) return false;
+                if (search && m.name.toLowerCase().indexOf(search) === -1
+                    && m.tags.join(" ").toLowerCase().indexOf(search) === -1) return false;
+                return true;
+            });
+
+            renderCards(filtered);
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            applyFilters();
+        });
+    })();
+    </script>
+</body>
+</html>

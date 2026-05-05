@@ -15,6 +15,32 @@ function getPreferences() {
     return JSON.parse(localStorage.getItem("mealPreferences") || "{}");
 }
 
+// ─── PACKING TIPS DATABASE ────────────────────────────────────────────────────
+const GENIE_PACKING_TIPS = {
+    "roti": "Wrap in aluminum foil while hot to keep them soft for 5+ hours.",
+    "paratha": "Apply a thin layer of ghee to keep them moist in the box.",
+    "rice": "Allow steam to escape for 1 minute before closing the lid to prevent sogginess.",
+    "khichdi": "Add a small cube of butter on top before packing to prevent it from drying.",
+    "sandwich": "Toast the bread lightly first so it doesn't get soggy from the fillings.",
+    "poha": "Garnish with fresh lemon only just before eating to keep it fresh.",
+    "idli": "Wrap idlis in a clean damp cloth inside the tiffin to keep them spongy.",
+    "dosa": "Roll them loosely rather than folding flat to keep the texture better.",
+    "chicken": "Keep the gravy separate or slightly thicker to avoid leakage.",
+    "egg": "If packing Boiled Eggs, peel them just before packing to retain moisture.",
+    "pasta": "Add a teaspoon of olive oil after boiling to keep it from sticking.",
+    "noodles": "Pack with a small fork and ensure they are not overcooked.",
+    "sabzi": "Drain excess oil before packing to keep the tiffin clean."
+};
+
+function getPackingTip(mealName) {
+    var name = mealName.toLowerCase();
+    var found = null;
+    Object.keys(GENIE_PACKING_TIPS).forEach(function(key) {
+        if (name.includes(key)) found = GENIE_PACKING_TIPS[key];
+    });
+    return found;
+}
+
 function updatePreference(mealName, action) {
     if (!mealName) return;
     var prefs = getPreferences();
@@ -38,11 +64,22 @@ function getMealWeight(meal, prefs) {
         if (profile.realityMode) {
             var isSimple = (meal.tags || []).indexOf("simple") !== -1 || meal.custom;
             if (!isSimple) {
-                weight *= 0.1; // heavily reduce probability
+                weight *= 0.1; 
             } else {
-                weight *= 1.5; // slight boost to simple meals
+                weight *= 1.8; // Boosted from 1.5
             }
         }
+    }
+
+    // Always give custom meals a significant boost so they actually appear in "options"
+    if (meal.custom) {
+        weight *= 3.0; 
+    }
+
+    // Favourites boost: meals hearted in Genie Kitchen get priority
+    var favs = JSON.parse(localStorage.getItem("mealFavorites") || "[]");
+    if (favs.indexOf(meal.name) !== -1) {
+        weight *= 5.0;
     }
 
     return Math.max(0.1, weight); // never fully remove to maintain variety
@@ -88,7 +125,9 @@ function getCustomMeals(cuisine) {
     if (!raw) return { breakfast: [], lunch: [], dinner: [] };
     var all = JSON.parse(raw);
     var matched = all.filter(function(m) {
-        return m.cuisine === cuisine || m.cuisine === "mixed" || cuisine === "mixed";
+        // More inclusive: show custom meals if they match user's cuisine OR if they are marked 'mixed'
+        // OR if the user's cuisine isn't strictly set.
+        return m.cuisine === cuisine || m.cuisine === "mixed" || cuisine === "mixed" || !cuisine;
     });
     var result = { breakfast: [], lunch: [], dinner: [] };
     matched.forEach(function(m) {
@@ -174,6 +213,50 @@ function renderDashboard(profile, plan) {
             + '</div></div>';
     });
     box.innerHTML = html;
+    updateHealthScoreUI(plan);
+    
+    // Check reminder state
+    var rem = localStorage.getItem("prepRemindersEnabled") === "true";
+    var toggle = document.getElementById("prepReminderToggle");
+    if (toggle) toggle.checked = rem;
+}
+
+// ─── HEALTH SCORE LOGIC ───────────────────────────────────────────────────────
+function updateHealthScoreUI(plan) {
+    var all = [];
+    Object.keys(plan).forEach(function(d) {
+        if (plan[d].breakfast) all.push(plan[d].breakfast);
+        if (plan[d].lunch) all.push(plan[d].lunch);
+        if (plan[d].dinner) all.push(plan[d].dinner);
+    });
+    
+    var stats = calcStats(all);
+    var avg = Math.round((stats.protein + stats.fiber + stats.energy) / 3);
+    
+    var circle = document.getElementById("healthScoreCircle");
+    var text   = document.getElementById("healthScoreText");
+    if (!circle || !text) return;
+
+    circle.innerText = avg;
+    if (avg >= 80) { circle.style.background = "#10b981"; text.innerText = "Excellent"; }
+    else if (avg >= 60) { circle.style.background = "#f59e0b"; text.innerText = "Good"; }
+    else { circle.style.background = "#ef4444"; text.innerText = "Needs Work"; }
+}
+
+// ─── PREP REMINDERS LOGIC ─────────────────────────────────────────────────────
+window.togglePrepReminders = function(enabled) {
+    localStorage.setItem("prepRemindersEnabled", enabled);
+    if (enabled) {
+        if (!("Notification" in window)) {
+            alert("This browser does not support desktop notifications.");
+            return;
+        }
+        Notification.requestPermission().then(function(permission) {
+            if (permission === "granted") {
+                new Notification("TiffinGenie", { body: "Awesome! We'll remind you every evening to prep for tomorrow's tiffin." });
+            }
+        });
+    }
 }
 
 // ─── BUILD ONE MEAL ROW FOR DAY MODAL ─────────────────────────────────────────
@@ -186,6 +269,12 @@ function buildMealSection(day, type, meal, emoji, bg, textColor) {
     }).join(" ");
 
     var sectionId = "swap_" + day + "_" + type;
+
+    var tip = getPackingTip(meal.name);
+    var tipHTML = tip 
+        ? '<div style="margin-top:12px;padding:8px 12px;background:#fffbeb;border-left:3px solid #f59e0b;font-size:12px;color:#92400e;border-radius:4px;">'
+          + '<strong>💡 Genie Tip:</strong> ' + tip + '</div>'
+        : '';
 
     return '<div id="section_' + sectionId + '" style="padding:16px;border-radius:14px;background:#f9fafb;margin-bottom:12px;transition:background 0.2s;">'
         + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'
@@ -200,13 +289,14 @@ function buildMealSection(day, type, meal, emoji, bg, textColor) {
         + meal.name + badge
         + '</div>'
         + '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">' + tagHTML + '</div>'
+        + tipHTML
         + '<div id="' + sectionId + '" style="display:none;margin-top:12px;"></div>'
         + '</div>';
 }
 
 // ─── SMART SWAP ENGINE ────────────────────────────────────────────────────────
 function getSmartSwaps(current, pool, maxResults) {
-    maxResults = maxResults || 3;
+    maxResults = maxResults || 5;
     var currentTags = current.tags || [];
     var prefs = getPreferences();
 
@@ -280,7 +370,7 @@ function showSwapOptions(day, type) {
 
     var pool    = filterByAllergy((db[type] || []).concat(custom[type] || []), allergies);
     var current = currentPlan[day][type];
-    var options = getSmartSwaps(current, pool, 3);
+    var options = getSmartSwaps(current, pool, 5);
 
     // Persist candidates for selectSwap()
     swapCandidates[sectionId] = options;
@@ -363,7 +453,7 @@ function openDayModal(day) {
     content.innerHTML =
         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">'
         + '<h3 style="font-family:\'Fredoka\';font-size:28px;margin:0;color:#111827;">' + day + '</h3>'
-        + '<button onclick="closeDayModal()" style="background:none;border:none;font-size:26px;cursor:pointer;color:#9ca3af;line-height:1;padding:0;">&times;</button>'
+        + '<button onclick="closeDayModal()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#9ca3af;line-height:1;padding:5px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:0.2s;" onmouseover="this.style.background=\'#f3f4f6\';this.style.color=\'#111827\'" onmouseout="this.style.background=\'none\';this.style.color=\'#9ca3af\'">&times;</button>'
         + '</div>'
         + buildMealSection(day, "breakfast", d.breakfast, "&#127749;", "#fef3c7", "#92400e")
         + buildMealSection(day, "lunch",     d.lunch,     "&#9728;&#65039;", "#d1fae5", "#065f46")
@@ -372,10 +462,10 @@ function openDayModal(day) {
     modal.style.display = "flex";
 }
 
-function closeDayModal() {
+window.closeDayModal = function() {
     var m = document.getElementById("dayDetailModal");
     if (m) m.style.display = "none";
-}
+};
 
 // ─── REGENERATE A SINGLE MEAL ─────────────────────────────────────────────────
 function regenerateMeal(day, type) {
@@ -447,10 +537,10 @@ function openAddMealModal() {
     document.getElementById("cmFeedback").innerText = "";
 }
 
-function closeAddMealModal() {
+window.closeAddMealModal = function() {
     var m = document.getElementById("addMealModal");
     if (m) m.style.display = "none";
-}
+};
 
 // ─── GENERATE & SAVE ───────────────────────────────────────────────────────────
 function generateFullPlan() {
@@ -540,24 +630,35 @@ function extractIngredients(mealName) {
     var name = mealName.toLowerCase();
     var ingredients = [];
 
-    if (name.includes("poha")) ingredients.push({ name: "Rice Flakes (Poha)", category: "Grains" }, { name: "Peanuts", category: "Protein" }, { name: "Onion", category: "Vegetables" });
-    if (name.includes("dal") || name.includes("sambar") || name.includes("rajma") || name.includes("chole") || name.includes("lentil") || name.includes("besan") || name.includes("kadhi") || name.includes("moong") || name.includes("masoor")) ingredients.push({ name: "Mixed Lentils / Pulses", category: "Protein" });
-    if (name.includes("roti") || name.includes("paratha") || name.includes("chapati") || name.includes("thepla") || name.includes("bhature") || name.includes("wheat")) ingredients.push({ name: "Wheat Flour", category: "Grains" });
-    if (name.includes("rice") || name.includes("chawal") || name.includes("biryani") || name.includes("pulao") || name.includes("khichdi") || name.includes("idli") || name.includes("dosa")) ingredients.push({ name: "Rice", category: "Grains" });
-    if (name.includes("paneer")) ingredients.push({ name: "Paneer", category: "Dairy" });
-    if (name.includes("chicken")) ingredients.push({ name: "Chicken", category: "Protein" });
-    if (name.includes("egg") || name.includes("omelette")) ingredients.push({ name: "Eggs", category: "Protein" });
-    if (name.includes("fish") || name.includes("prawn")) ingredients.push({ name: "Fish / Seafood", category: "Protein" });
-    if (name.includes("mutton") || name.includes("keema")) ingredients.push({ name: "Mutton", category: "Protein" });
-    if (name.includes("sabzi") || name.includes("gobi") || name.includes("veg") || name.includes("pav bhaji")) ingredients.push({ name: "Mixed Vegetables", category: "Vegetables" });
-    if (name.includes("palak")) ingredients.push({ name: "Spinach", category: "Vegetables" });
-    if (name.includes("aloo")) ingredients.push({ name: "Potatoes", category: "Vegetables" });
-    if (name.includes("bread") || name.includes("sandwich") || name.includes("pav") || name.includes("toast")) ingredients.push({ name: "Bread", category: "Grains" });
-    if (name.includes("upma") || name.includes("rava")) ingredients.push({ name: "Semolina (Rava)", category: "Grains" });
-    if (name.includes("curd")) ingredients.push({ name: "Curd / Yogurt", category: "Dairy" });
+    // format: { name, category, qtyPerMeal, unit }
+    if (name.includes("poha")) {
+        ingredients.push({ name: "Rice Flakes (Poha)", category: "Grains", qty: 100, unit: "g" });
+        ingredients.push({ name: "Peanuts", category: "Protein", qty: 15, unit: "g" });
+        ingredients.push({ name: "Onion", category: "Vegetables", qty: 0.5, unit: "pc" });
+    }
+    if (name.includes("dal") || name.includes("sambar") || name.includes("rajma") || name.includes("chole") || name.includes("lentil") || name.includes("besan") || name.includes("kadhi") || name.includes("moong") || name.includes("masoor")) {
+        ingredients.push({ name: "Mixed Lentils / Pulses", category: "Protein", qty: 80, unit: "g" });
+    }
+    if (name.includes("roti") || name.includes("paratha") || name.includes("chapati") || name.includes("thepla") || name.includes("bhature") || name.includes("wheat")) {
+        ingredients.push({ name: "Wheat Flour", category: "Grains", qty: 120, unit: "g" });
+    }
+    if (name.includes("rice") || name.includes("chawal") || name.includes("biryani") || name.includes("pulao") || name.includes("khichdi") || name.includes("idli") || name.includes("dosa")) {
+        ingredients.push({ name: "Rice", category: "Grains", qty: 100, unit: "g" });
+    }
+    if (name.includes("paneer")) ingredients.push({ name: "Paneer", category: "Dairy", qty: 100, unit: "g" });
+    if (name.includes("chicken")) ingredients.push({ name: "Chicken", category: "Protein", qty: 150, unit: "g" });
+    if (name.includes("egg") || name.includes("omelette")) ingredients.push({ name: "Eggs", category: "Protein", qty: 2, unit: "pcs" });
+    if (name.includes("fish") || name.includes("prawn")) ingredients.push({ name: "Fish / Seafood", category: "Protein", qty: 150, unit: "g" });
+    if (name.includes("mutton") || name.includes("keema")) ingredients.push({ name: "Mutton", category: "Protein", qty: 150, unit: "g" });
+    if (name.includes("sabzi") || name.includes("gobi") || name.includes("veg") || name.includes("pav bhaji")) ingredients.push({ name: "Mixed Vegetables", category: "Vegetables", qty: 150, unit: "g" });
+    if (name.includes("palak")) ingredients.push({ name: "Spinach", category: "Vegetables", qty: 100, unit: "g" });
+    if (name.includes("aloo")) ingredients.push({ name: "Potatoes", category: "Vegetables", qty: 1, unit: "pc" });
+    if (name.includes("bread") || name.includes("sandwich") || name.includes("pav") || name.includes("toast")) ingredients.push({ name: "Bread", category: "Grains", qty: 3, unit: "slices" });
+    if (name.includes("upma") || name.includes("rava")) ingredients.push({ name: "Semolina (Rava)", category: "Grains", qty: 80, unit: "g" });
+    if (name.includes("curd")) ingredients.push({ name: "Curd / Yogurt", category: "Dairy", qty: 100, unit: "g" });
     
-    ingredients.push({ name: "Cooking Oil / Ghee", category: "Others" });
-    ingredients.push({ name: "Basic Spices (Salt, Pepper, Turmeric, Cumin)", category: "Others" });
+    ingredients.push({ name: "Cooking Oil / Ghee", category: "Others", qty: 15, unit: "ml" });
+    ingredients.push({ name: "Salt & Basic Spices", category: "Others", qty: 5, unit: "g" });
 
     return ingredients;
 }
@@ -568,19 +669,33 @@ function generateGroceryList() {
     
     var plan = JSON.parse(rawPlan);
     var listMap = {};
+
+    // Get Age Multiplier
+    var ageMult = 1.0;
+    var profileRaw = localStorage.getItem("userProfile");
+    if (profileRaw) {
+        var p = JSON.parse(profileRaw);
+        var age = parseInt(p.childAge || 7);
+        if (age < 5) ageMult = 0.7;
+        else if (age > 12) ageMult = 1.4;
+    }
     
     ["Vegetables", "Fruits", "Grains", "Protein", "Dairy", "Others"].forEach(function(cat) {
-        listMap[cat] = new Set();
+        listMap[cat] = {};
     });
 
     Object.keys(plan).forEach(function(day) {
         var dayPlan = plan[day];
         ["breakfast", "lunch", "dinner"].forEach(function(mealType) {
             if (dayPlan[mealType]) {
-                var ing = extractIngredients(dayPlan[mealType].name);
-                ing.forEach(function(item) {
-                    if (listMap[item.category]) {
-                        listMap[item.category].add(item.name);
+                var ings = extractIngredients(dayPlan[mealType].name);
+                ings.forEach(function(item) {
+                    var cat = item.category;
+                    if (listMap[cat]) {
+                        if (!listMap[cat][item.name]) {
+                            listMap[cat][item.name] = { qty: 0, unit: item.unit };
+                        }
+                        listMap[cat][item.name].qty += (item.qty * ageMult);
                     }
                 });
             }
@@ -596,30 +711,41 @@ function openGroceryModal() {
     if (!container) return;
     
     var html = "";
-    
     var totalItems = 0;
+
     Object.keys(listMap).forEach(function(cat) {
-        if (listMap[cat].size > 0) totalItems++;
+        var items = listMap[cat];
+        var itemNames = Object.keys(items);
+        
+        if (itemNames.length > 0) {
+            html += '<div style="margin-bottom:20px;">';
+            html += '<h4 style="margin:0 0 12px;font-size:15px;color:#ff7aa2;border-bottom:1.5px solid #fff0f5;padding-bottom:6px;font-family:\'Fredoka\'">' + cat + '</h4>';
+            
+            itemNames.forEach(function(name) {
+                var data = items[name];
+                var displayQty = data.qty;
+                
+                if (data.unit === "g" && displayQty >= 1000) {
+                    displayQty = (displayQty / 1000).toFixed(1) + " kg";
+                } else if (data.unit === "ml" && displayQty >= 1000) {
+                    displayQty = (displayQty / 1000).toFixed(1) + " L";
+                } else {
+                    displayQty = Math.ceil(displayQty) + " " + data.unit;
+                }
+
+                html += '<label style="display:flex;align-items:center;gap:12px;margin-bottom:8px;font-size:14px;color:#374151;cursor:pointer;padding:6px;border-radius:8px;transition:background 0.2s;" onmouseover="this.style.background=\'#f9fafb\'" onmouseout="this.style.background=\'none\'">';
+                html += '<input type="checkbox" style="width:18px;height:18px;accent-color:#ff7aa2;cursor:pointer;">';
+                html += '<span style="flex:1;">' + name + '</span>';
+                html += '<span style="font-size:13px;color:#9ca3af;font-weight:600;">' + displayQty + '</span>';
+                html += '</label>';
+                totalItems++;
+            });
+            html += '</div>';
+        }
     });
-    
+
     if (totalItems === 0) {
         html = "<p style='color:#6b7280;text-align:center;padding:20px;font-size:14px;'>Generate a weekly plan first to view your grocery list!</p>";
-    } else {
-        Object.keys(listMap).forEach(function(cat) {
-            if (listMap[cat].size > 0) {
-                html += '<div style="margin-bottom:20px;">';
-                html += '<h4 style="margin:0 0 12px;font-size:15px;color:#ff7aa2;border-bottom:1.5px solid #fff0f5;padding-bottom:6px;font-family:\'Fredoka\'">' + cat + '</h4>';
-                
-                listMap[cat].forEach(function(item) {
-                    html += '<label style="display:flex;align-items:center;gap:12px;margin-bottom:8px;font-size:14px;color:#374151;cursor:pointer;padding:6px;border-radius:8px;transition:background 0.2s;" onmouseover="this.style.background=\'#f9fafb\'" onmouseout="this.style.background=\'none\'">';
-                    html += '<input type="checkbox" style="width:18px;height:18px;accent-color:#ff7aa2;cursor:pointer;">';
-                    html += '<span>' + item + '</span>';
-                    html += '</label>';
-                });
-                
-                html += '</div>';
-            }
-        });
     }
 
     container.innerHTML = html;
@@ -776,6 +902,16 @@ function openInsightsModal() {
 
     document.getElementById("insightsModal").style.display = "flex";
 }
+
+window.closeInsightsModal = function() {
+    var modal = document.getElementById("insightsModal");
+    if (modal) modal.style.display = "none";
+};
+
+window.closeGroceryModal = function() {
+    var modal = document.getElementById("groceryModal");
+    if (modal) modal.style.display = "none";
+};
 
 // ─── BACKDROP CLOSE ────────────────────────────────────────────────────────────
 window.addEventListener("click", function(e) {
