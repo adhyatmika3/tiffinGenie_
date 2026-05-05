@@ -92,8 +92,8 @@ async function initSession() {
             .catch(err => console.error("[PWA] Registration Failed:", err));
     }
 
-    // Initialize Genie AI
-    initGenieChat();
+    // Initialize Genie AI is now handled by assistant.js
+    // initGenieChat();
 }
 
     function renderAuthUI(name) {
@@ -163,102 +163,7 @@ window.togglePrepReminders = function(enabled) {
     }
 };
 
-function initGenieChat() {
-    if (document.getElementById("genieChatContainer")) return;
-    
-    const html = `
-        <div id="genieChatContainer" style="position:fixed; bottom:30px; right:30px; z-index:99999; font-family:'Poppins', sans-serif;">
-            <button id="genieChatBtn" onclick="toggleGenieChat()" style="width:70px; height:70px; border-radius:50%; background:#ff7aa2; border:none; box-shadow:0 10px 30px rgba(255,122,162,0.4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.3s; position:relative;">
-                <span style="font-size:35px;">🤖</span>
-                <span id="geniePulse" style="position:absolute; inset:0; border-radius:50%; background:#ff7aa2; opacity:0.3; animation: pulse 2s infinite;"></span>
-            </button>
-            
-            <div id="genieChatBox" style="display:none; position:absolute; bottom:90px; right:0; width:350px; height:500px; background:#fff; border-radius:24px; box-shadow:0 20px 60px rgba(0,0,0,0.15); flex-direction:column; overflow:hidden; animation: slideUp 0.4s ease;">
-                <div style="background:#ff7aa2; padding:25px; color:#fff; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-family:'Fredoka'; font-size:20px;">Genie AI</div>
-                        <div style="font-size:12px; opacity:0.9;">Ask me about child nutrition!</div>
-                    </div>
-                    <button onclick="toggleGenieChat()" style="background:none; border:none; color:#fff; font-size:24px; cursor:pointer;">×</button>
-                </div>
-                
-                <div id="genieChatMessages" style="flex:1; padding:20px; overflow-y:auto; background:#f9fafb; display:flex; flex-direction:column; gap:15px;">
-                    <div style="background:#fff; padding:12px 16px; border-radius:18px; border:1px solid #eee; font-size:14px; color:#374151; max-width:85%;">
-                        👋 Hi! I'm your Nutrition Genie. Ask me things like:
-                        <ul style="margin:10px 0 0; padding-left:15px; font-size:12px; color:#6b7280;">
-                            <li>"My child has a cold"</li>
-                            <li>"High protein breakfast"</li>
-                            <li>"I have potato and eggs"</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div style="padding:15px; background:#fff; border-top:1px solid #eee; display:flex; gap:10px;">
-                    <input type="text" id="genieChatInput" placeholder="Ask the Genie..." style="flex:1; padding:12px 16px; border:1px solid #e5e7eb; border-radius:15px; outline:none; font-family:inherit; font-size:14px;" onkeypress="if(event.key==='Enter') sendGenieMessage()">
-                    <button onclick="sendGenieMessage()" style="background:#ff7aa2; color:#fff; border:none; width:45px; height:45px; border-radius:12px; cursor:pointer; font-size:20px;">➔</button>
-                </div>
-            </div>
-        </div>
-        <style>
-            @keyframes pulse { 0% { transform: scale(1); opacity: 0.3; } 100% { transform: scale(1.6); opacity: 0; } }
-            @keyframes slideUp { from { transform: translateY(20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
-            .genie-msg-user { background:#ff7aa2; color:#fff; padding:12px 16px; border-radius:18px 18px 0 18px; font-size:14px; align-self:flex-end; max-width:85%; box-shadow:0 5px 15px rgba(255,122,162,0.2); }
-            .genie-msg-bot { background:#fff; color:#374151; padding:12px 16px; border-radius:18px 18px 18px 0; font-size:14px; align-self:flex-start; max-width:85%; border:1px solid #eee; }
-        </style>
-    `;
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    document.body.appendChild(div);
-}
 
-window.toggleGenieChat = function() {
-    const box = document.getElementById("genieChatBox");
-    const isOpen = box.style.display === "flex";
-    box.style.display = isOpen ? "none" : "flex";
-    if (!isOpen) {
-        setTimeout(() => document.getElementById("genieChatInput").focus(), 100);
-    }
-};
-
-window.sendGenieMessage = function() {
-    const input = document.getElementById("genieChatInput");
-    const msg = input.value.trim();
-    if (!msg) return;
-    
-    addMessageToChat(msg, 'user');
-    input.value = "";
-    
-    // Simulate Genie "Thinking"
-    setTimeout(() => {
-        const response = getGenieResponse(msg.toLowerCase());
-        addMessageToChat(response, 'bot');
-    }, 600);
-};
-
-function addMessageToChat(text, sender) {
-    const container = document.getElementById("genieChatMessages");
-    const div = document.createElement("div");
-    div.className = sender === 'user' ? 'genie-msg-user' : 'genie-msg-bot';
-    div.innerText = text;
-    container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
-}
-
-function getGenieResponse(query) {
-    if (query.includes("cold") || query.includes("sick") || query.includes("cough")) {
-        return "Oh no! For a cold, I recommend warm, light meals. Ginger Lemon Poha or a warm Dal Chilla are perfect for recovery.";
-    }
-    if (query.includes("protein")) {
-        return "Growth power! 💪 For high protein, try Paneer Bhurji with Roti or Soya Chunks Salad. Both are kid-approved!";
-    }
-    if (query.includes("potato") || query.includes("aloo")) {
-        return "Aloo is a favorite! You can make Aloo Paratha, or a quick Aloo-Paneer sandwich for the tiffin.";
-    }
-    if (query.includes("egg")) {
-        return "Eggs are great! Egg Bhurji or an Omelette Roll are quick and high in energy for active kids.";
-    }
-    return "That's a great question! I'm checking my recipe book... I'd recommend a balanced meal like Vegetable Khichdi or Idli Sambar for a healthy day!";
-}
 
     window.toggleUserDropdown = function() {
         const dd = document.getElementById("navUserDropdown");
