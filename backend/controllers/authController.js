@@ -7,50 +7,45 @@ const generateToken = (id) => {
     });
 };
 
+const ADMIN_EMAILS = [
+    'owner@tiffingenie.com', 
+    'admin@tiffingenie.com',
+    'adhyatmika3@gmail.com'
+];
+
 // @desc    Register a new user
 // @route   POST /api/auth/signup
-// @access  Public
 const registerUser = async (req, res) => {
     try {
-        const { email } = req.body;
-
-        if (!email) {
-            return res.status(400).json({ message: 'Please provide email' });
-        }
+        const { email, password } = req.body;
+        if (!email || !password) return res.status(400).json({ message: 'Email and password required' });
 
         const normalizedEmail = email.trim().toLowerCase();
+        const assignedRole = ADMIN_EMAILS.includes(normalizedEmail) ? 'admin' : 'user';
 
-        console.log(`[Signup Attempt] Checking if user exists: ${normalizedEmail}`);
-        const userExists = await User.findOne({ email: normalizedEmail });
-
-        if (userExists) {
-            console.log(`[Signup] User already exists: ${normalizedEmail}, logging in directly.`);
-            return res.status(200).json({
-                _id: userExists.id,
-                name: userExists.email.split('@')[0],
-                email: userExists.email,
-                token: generateToken(userExists.id),
-                message: 'User already exists, logged in instead'
-            });
-        }
-
-        const user = await User.create({
-            email: normalizedEmail
-        });
+        let user = await User.findOne({ email: normalizedEmail });
 
         if (user) {
-            console.log(`[Signup Success] User saved to 'users' collection: ${normalizedEmail}`);
-            res.status(201).json({
-                _id: user.id,
-                name: user.email.split('@')[0], // Fallback name
-                email: user.email,
-                token: generateToken(user.id),
-                message: 'Signup successful'
-            });
+            // Update role if they are in the admin list
+            if (ADMIN_EMAILS.includes(normalizedEmail)) user.role = 'admin';
+            if (password) user.password = password; 
+            await user.save();
         } else {
-            console.log(`[Signup Failed] Invalid user data for: ${normalizedEmail}`);
-            res.status(400).json({ message: 'Invalid user data' });
+            user = await User.create({
+                email: normalizedEmail,
+                password: password,
+                role: assignedRole
+            });
         }
+
+        res.status(201).json({
+            _id: user.id,
+            name: user.email.split('@')[0],
+            email: user.email,
+            role: user.role,
+            token: generateToken(user.id),
+            message: 'Signup successful'
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -58,30 +53,39 @@ const registerUser = async (req, res) => {
 
 // @desc    Authenticate a user
 // @route   POST /api/auth/login
-// @access  Public
 const loginUser = async (req, res) => {
     try {
-        const { email } = req.body;
-
-        if (!email) {
-            return res.status(400).json({ message: 'Please provide email' });
-        }
+        const { email, password } = req.body;
+        if (!email || !password) return res.status(400).json({ message: 'Email and password required' });
 
         const normalizedEmail = email.trim().toLowerCase();
-        console.log(`[Login Attempt] Searching for user: ${normalizedEmail}`);
-
         const user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {
-            console.log(`[Login Failed] User not found: ${normalizedEmail}`);
-            return res.status(401).json({ message: 'Invalid credentials - User not found' });
+            return res.status(401).json({ message: 'User not found' });
         }
 
-        console.log(`[Login Success] Token generated for: ${normalizedEmail}`);
+        // Handle Admin promotion
+        if (ADMIN_EMAILS.includes(normalizedEmail)) {
+            user.role = 'admin';
+            await user.save();
+        }
+
+        // Handle Legacy Passwordless users
+        if (!user.password) {
+            user.password = password;
+            await user.save();
+        } else {
+            if (!(await user.matchPassword(password))) {
+                return res.status(401).json({ message: 'Incorrect password' });
+            }
+        }
+
         res.json({
             _id: user.id,
-            name: user.email.split('@')[0], // Fallback name
+            name: user.email.split('@')[0],
             email: user.email,
+            role: user.role,
             token: generateToken(user.id),
             message: 'Login successful'
         });
@@ -90,9 +94,22 @@ const loginUser = async (req, res) => {
     }
 };
 
-// @desc    Get current user data
+// @desc    Get all users (Admin only)
+// @route   GET /api/auth/users
+const getAllUsers = async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Not authorized as an admin' });
+        }
+        const users = await User.find({}).select('-password');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Get user profile
 // @route   GET /api/auth/me
-// @access  Private
 const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
@@ -102,8 +119,4 @@ const getMe = async (req, res) => {
     }
 };
 
-module.exports = {
-    registerUser,
-    loginUser,
-    getMe
-};
+module.exports = { registerUser, loginUser, getMe, getAllUsers };

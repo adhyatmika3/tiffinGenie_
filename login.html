@@ -37,6 +37,11 @@
                     <label>Email Address</label>
                     <input type="email" id="loginEmail" placeholder="Enter your email" required>
                 </div>
+                <div class="form-group">
+                    <label>Account Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password (min 6 chars)" required minlength="6">
+                    <p style="font-size:11px; color:#999; margin-top:5px;">First time? This will be your new password.</p>
+                </div>
                 
                 <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 16px; margin-top: 10px;">Login & Continue</button>
             </form>
@@ -51,116 +56,112 @@
     <script src="js/footer.js"></script>
 
     <script>
-        // INLINE LOGIN LOGIC — guaranteed to execute
+        // CLEAN AUTH SYSTEM — logic unified
         (function() {
-            console.log("[LOGIN] Inline script running");
+            console.log("[LOGIN] System active");
 
-            // If profile already exists, go straight to dashboard
-            if (localStorage.getItem("userProfile")) {
-                console.log("[LOGIN] Profile found, redirecting to dashboard");
-                window.location.href = "dashboard.html";
-                return;
-            }
+            const form = document.getElementById("loginFormBlock");
+            const feedback = document.getElementById("loginFeedback");
 
-            var form = document.getElementById("loginFormBlock");
-            var feedback = document.getElementById("loginFeedback");
+            if (!form) return;
 
-            if (!form) {
-                console.error("[LOGIN] CRITICAL: Form not found!");
-                return;
-            }
-
-            console.log("[LOGIN] Form found, attaching submit handler");
-
-            form.onsubmit = function(e) {
+            form.onsubmit = async function(e) {
                 e.preventDefault();
-                console.log("[LOGIN] Form submitted!");
+                feedback.innerText = "Verifying... ⏳";
+                feedback.style.color = "#333";
 
-                var name = document.getElementById("loginName").value.trim();
-                var email = document.getElementById("loginEmail").value.trim().toLowerCase();
+                const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+                const name = document.getElementById("loginName").value.trim();
+                const password = document.getElementById("loginPassword").value;
 
-                if (!name || !email) {
+                if (!email || !name || !password) {
                     feedback.innerText = "Please fill in all fields.";
                     feedback.style.color = "orange";
                     return;
                 }
 
-                console.log("[LOGIN] Data:", { name: name, email: email });
-
-                // Save data immediately for immediate UI response
-                localStorage.setItem("userEmail", email);
-                localStorage.setItem("user", JSON.stringify({ name: name, email: email }));
-                
-                feedback.innerText = "Welcome! Redirecting... ✅";
-                feedback.style.color = "green";
-
-                // Check if profile exists → dashboard, otherwise → onboarding
-                var profile = localStorage.getItem("userProfile");
-                var destination = profile ? "dashboard.html" : "onboarding.html";
-
-                console.log("[LOGIN] Redirecting to:", destination);
-
-                // Try backend in background (non-blocking)
                 try {
-                    fetch("http://localhost:5000/api/auth/login", {
+                    // 1. Attempt Backend Login
+                    const response = await fetch("http://localhost:5000/api/auth/login", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email: email })
-                    }).then(function(res) { return res.json(); })
-                    .then(function(data) {
-                        if (data && data.token) {
-                            localStorage.setItem("token", data.token);
-                            localStorage.setItem("user", JSON.stringify({
-                                name: data.name || name, email: data.email, _id: data._id
-                            }));
-                            
-                            // ── NEW: Try fetching child profile ──
-                            fetch("http://localhost:5000/api/child/" + data._id, {
-                                headers: { "Authorization": "Bearer " + data.token }
-                            })
-                            .then(function(r) { return r.json(); })
-                            .then(function(profileData) {
-                                if (profileData && profileData.name) {
-                                    // Map backend keys to our userProfile keys
-                                    var profile = {
-                                        parentName: data.name || name,
-                                        email: data.email,
-                                        childName: profileData.name,
-                                        age: profileData.age,
-                                        diet: profileData.diet,
-                                        cuisine: profileData.cuisine || "indian_veg",
-                                        allergies: profileData.allergies || []
-                                    };
-                                    localStorage.setItem("userProfile", JSON.stringify(profile));
-                                    window.location.href = "dashboard.html"; // Success!
-                                } else {
-                                    window.location.href = "onboarding.html";
-                                }
-                            })
-                            .catch(function() {
-                                window.location.href = "onboarding.html";
-                            });
-                        } else {
-                            // Backend responded, but no token (e.g., user not found)
-                            console.warn("[LOGIN] No token returned, using fallback");
-                            setTimeout(function() {
-                                window.location.href = destination;
-                            }, 600);
-                        }
-                    }).catch(function() {
-                        console.warn("[LOGIN] Backend not available, using fallback");
-                        setTimeout(function() {
-                            window.location.href = destination;
-                        }, 600);
+                        body: JSON.stringify({ email: email, password: password })
                     });
-                } catch(err) {
-                    setTimeout(function() {
-                        window.location.href = destination;
-                    }, 600);
+
+                    const data = await response.json();
+
+                    if (response.ok && data.token) {
+                        // SUCCESS: Existing user logged in
+                        handleLoginSuccess(data, email, name);
+                    } else if (response.status === 401 && data.message.includes("not found")) {
+                        // USER NOT FOUND: Attempt auto-signup
+                        feedback.innerText = "Creating your new account... ⏳";
+                        const signupRes = await fetch("http://localhost:5000/api/auth/signup", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email: email, name: name, password: password })
+                        });
+                        const signupData = await signupRes.json();
+                        
+                        if (signupRes.ok && signupData.token) {
+                            handleLoginSuccess(signupData, email, name);
+                        } else {
+                            feedback.innerText = signupData.message || "Signup failed.";
+                            feedback.style.color = "#ef4444";
+                        }
+                    } else {
+                        // Backend error (e.g. Incorrect Password)
+                        feedback.innerText = data.message || "Invalid credentials.";
+                        feedback.style.color = "#ef4444";
+                    }
+                } catch (err) {
+                    console.error("[LOGIN] Connection error:", err);
+                    feedback.innerText = "Cannot connect to server. Please try again later.";
+                    feedback.style.color = "#ef4444";
                 }
             };
 
-            console.log("[LOGIN] Ready ✅");
+            async function handleLoginSuccess(data, email, name) {
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("userEmail", email);
+                localStorage.setItem("userRole", data.role || "user");
+                localStorage.setItem("user", JSON.stringify({
+                    name: data.name || name, 
+                    email: data.email, 
+                    _id: data._id
+                }));
+
+                // Check if Child Profile exists
+                try {
+                    const childRes = await fetch("http://localhost:5000/api/children/" + data._id, {
+                        headers: { "Authorization": "Bearer " + data.token }
+                    });
+                    const children = await childRes.json();
+
+                    if (childRes.ok && children && children.length > 0) {
+                        const profileData = children[0];
+                        const profile = {
+                            parentName: data.name || name,
+                            email: data.email,
+                            childName: profileData.name,
+                            age: profileData.age,
+                            diet: profileData.diet,
+                            cuisine: profileData.cuisine || "indian_veg",
+                            allergies: profileData.allergies || []
+                        };
+                        localStorage.setItem("userProfile", JSON.stringify(profile));
+                        feedback.innerText = "Welcome back! Redirecting... ✅";
+                        feedback.style.color = "green";
+                        setTimeout(() => window.location.href = "dashboard.html", 800);
+                    } else {
+                        feedback.innerText = "Welcome! Let's set up your child's profile... ⏳";
+                        feedback.style.color = "blue";
+                        setTimeout(() => window.location.href = "onboarding.html", 800);
+                    }
+                } catch (err) {
+                    window.location.href = "onboarding.html";
+                }
+            }
         })();
     </script>
 </body>

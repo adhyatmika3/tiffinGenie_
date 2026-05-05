@@ -41,41 +41,58 @@ async function initSession() {
         return;
     }
 
-    // Check localStorage first
-    const userProfile = localStorage.getItem("userProfile");
-    const userEmail = localStorage.getItem("userEmail");
+    // --- NEW STRICT AUTH CHECK ---
     const token = localStorage.getItem("token");
+    const userProfileRaw = localStorage.getItem("userProfile");
+    const userEmail = localStorage.getItem("userEmail");
 
-    if (userProfile || token) {
-        let displayName = "User";
-        if (userProfile) {
-            try {
-                const profile = JSON.parse(userProfile);
+    // Clear any potential "parent6" or junk if it's not a real session
+    if (!token && !userProfileRaw && !userEmail) {
+        console.log("[SESSION] No session found, rendering Guest UI");
+        renderGuestUI();
+        if (window.updateFooter) window.updateFooter(false);
+        return;
+    }
+
+    let displayName = "User";
+    let isActuallyLoggedIn = false;
+
+    if (userProfileRaw) {
+        try {
+            const profile = JSON.parse(userProfileRaw);
+            // Verify profile belongs to the current session email if possible
+            if (!userEmail || profile.email === userEmail) {
                 displayName = profile.parentName || profile.childName || profile.email?.split("@")[0] || "User";
-            } catch (e) {}
-        } else if (localStorage.getItem("user")) {
-            try {
-                const userObj = JSON.parse(localStorage.getItem("user"));
-                displayName = userObj.name || displayName;
-            } catch (e) {}
-        } else if (userEmail) {
-            displayName = userEmail.split("@")[0];
-        }
-
-        // Try backend validation (optional, non-blocking)
-        if (token) {
-            try {
-                const response = await fetch("http://localhost:5000/api/auth/me", {
-                    method: "GET",
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const activeProfile = await response.json();
-                    displayName = activeProfile.email?.split("@")[0] || displayName;
-                }
-            } catch (err) {
-                console.warn("[SESSION] Backend unreachable");
+                isActuallyLoggedIn = true;
             }
+        } catch (e) {
+            console.error("[SESSION] Corrupt userProfile found");
+        }
+    } else if (userEmail) {
+        displayName = userEmail.split("@")[0];
+        isActuallyLoggedIn = true;
+    }
+
+    if (isActuallyLoggedIn) {
+        // Try backend validation in background (non-blocking)
+        if (token) {
+            fetch("http://127.0.0.1:5001/api/auth/me", {
+                method: "GET",
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(res => res.json())
+            .then(data => {
+                if (data && data.role) {
+                    const oldRole = localStorage.getItem("userRole");
+                    if (oldRole !== data.role) {
+                        console.log("[SESSION] Syncing role:", data.role);
+                        localStorage.setItem("userRole", data.role);
+                        if (typeof injectNavbar === 'function') injectNavbar();
+                    }
+                }
+                if (data && data._id) {
+                     renderAuthUI(data.name || displayName);
+                }
+            }).catch(() => console.warn("[SESSION] Backend unreachable for verification"));
         }
 
         renderAuthUI(displayName);
@@ -83,8 +100,8 @@ async function initSession() {
         checkAdminReplies();
         if (window.updateFooter) window.updateFooter(true);
     } else {
-        renderGuestUI();
-        if (window.updateFooter) window.updateFooter(false);
+        // Cleanup inconsistent state
+        handleLogout(false); // Silent logout (don't redirect)
     }
 
     // Register PWA Service Worker
@@ -156,7 +173,7 @@ function renderGuestUI() {
     userPanel.innerHTML = `
         <div style="display:flex; align-items:center; gap:20px;">
             <a href="login.html" class="nav-link-secondary">Login</a>
-            <a href="recipes.html" class="nav-btn nav-btn-primary">View Recipes</a>
+            <a href="onboarding.html" class="nav-btn nav-btn-primary">Get Started</a>
         </div>
     `;
 }
@@ -206,59 +223,110 @@ function injectMessageModal() {
     document.body.appendChild(div);
 }
 
-window.openMessageModal = function() {
+window.openMessageModal = async function() {
     var profileRaw = localStorage.getItem("userProfile");
     var email = profileRaw ? JSON.parse(profileRaw).email : localStorage.getItem("userEmail");
     if (!email) return;
+
     var container = document.getElementById("messageModalContent");
-    var feedbacks = JSON.parse(localStorage.getItem("siteFeedbacks") || "[]");
-    var myReplies = feedbacks.filter(f => f.email === email && f.adminReply);
-    if (myReplies.length === 0) {
-        container.innerHTML = "<div style='text-align:center; padding:40px; color:#6b7280;'>No new messages from Admin.</div>";
-    } else {
-        var html = "";
-        myReplies.forEach(r => {
-            html += `
-                <div style="background:#f9fafb; padding:20px; border-radius:18px; border:1px solid #f0f0f0; margin-bottom:15px;">
-                    <div style="font-size:11px; color:#9ca3af; font-weight:700; text-transform:uppercase; margin-bottom:10px;">${r.replyDate || 'Recently'}</div>
-                    <div style="margin-bottom:12px; font-size:14px; color:#6b7280; border-left:3px solid #ff7aa2; padding-left:12px;"><strong>Your Inquiry:</strong> "${r.subject}"</div>
-                    <div style="font-size:15px; color:#111827; line-height:1.5;"><strong>Genie Team:</strong> ${r.adminReply}</div>
-                </div>
-            `;
+    const token = localStorage.getItem("token");
+
+    try {
+        const res = await fetch("http://127.0.0.1:5001/api/support/notifications", {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-        container.innerHTML = html;
+        
+        const myReplies = await res.json();
+        
+        if (myReplies.length === 0) {
+            container.innerHTML = "<div style='text-align:center; padding:40px; color:#6b7280;'>No new messages from Admin.</div>";
+        } else {
+            var html = "";
+            myReplies.forEach(r => {
+                html += `
+                    <div style="background:#f9fafb; padding:20px; border-radius:18px; border:1px solid #f0f0f0; margin-bottom:15px;">
+                        <div style="font-size:11px; color:#9ca3af; font-weight:700; text-transform:uppercase; margin-bottom:10px;">Reply to your ticket</div>
+                        <div style="margin-bottom:12px; font-size:14px; color:#6b7280; border-left:3px solid #ff7aa2; padding-left:12px;"><strong>Your Inquiry:</strong> "${r.message}"</div>
+                        <div style="font-size:15px; color:#111827; line-height:1.5;"><strong>Genie Team:</strong> ${r.adminResponse}</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            // Mark as read on the backend
+            await fetch("http://127.0.0.1:5001/api/support/mark-read", {
+                method: "POST",
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+        }
+        
+        document.getElementById("navNotifBadge").style.display = "none";
+        document.getElementById("messageModal").style.display = "flex";
+    } catch (err) {
+        console.error("Notification Error:", err);
+        container.innerHTML = "<div style='text-align:center; padding:40px; color:#ef4444;'>Could not load messages.</div>";
+        document.getElementById("messageModal").style.display = "flex";
     }
-    document.getElementById("navNotifBadge").style.display = "none";
-    localStorage.setItem("notif_lastSeen_" + email, feedbacks.length);
-    document.getElementById("messageModal").style.display = "flex";
 };
 
 window.closeMessageModal = function() {
     document.getElementById("messageModal").style.display = "none";
 };
 
-window.checkAdminReplies = function() {
+window.checkAdminReplies = async function() {
     var profileRaw = localStorage.getItem("userProfile");
     var email = profileRaw ? JSON.parse(profileRaw).email : localStorage.getItem("userEmail");
     if (!email) return;
-    var feedbacks = JSON.parse(localStorage.getItem("siteFeedbacks") || "[]");
-    var myReplies = feedbacks.filter(f => f.email === email && f.adminReply);
-    var lastSeen = localStorage.getItem("notif_lastSeen_" + email) || 0;
-    var badge = document.getElementById("navNotifBadge");
-    if (badge && myReplies.length > 0 && feedbacks.length > parseInt(lastSeen)) {
-        badge.innerText = myReplies.length;
-        badge.style.display = "flex";
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+        const res = await fetch("http://127.0.0.1:5001/api/support/notifications", {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const myReplies = await res.json();
+        
+        var badge = document.getElementById("navNotifBadge");
+        if (badge && myReplies.length > 0) {
+            badge.innerText = myReplies.length;
+            badge.style.display = "flex";
+        } else if (badge) {
+            badge.style.display = "none";
+        }
+    } catch (err) {
+        console.error("Check Replies Error:", err);
     }
 };
 
-window.handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userProfile");
-    localStorage.removeItem("weeklyPlan");
-    localStorage.removeItem("currentChildId");
-    window.location.href = "login.html";
+window.handleLogout = (redirect = true) => {
+    console.log("[SESSION] Clearing session...");
+    
+    // Clear ALL auth-related keys
+    const keysToRemove = [
+        "token", 
+        "user", 
+        "userEmail", 
+        "userRole",
+        "userProfile", 
+        "weeklyPlan", 
+        "currentChildId", 
+        "mealFavorites", 
+        "communityRecipes", 
+        "customMeals",
+        "prepRemindersEnabled",
+        "siteFeedbacks",
+        "adminAccess"
+    ];
+    
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    sessionStorage.clear(); // Extra safety
+
+    if (redirect) {
+        window.location.href = "login.html";
+    } else {
+        renderGuestUI();
+    }
 };
 
 window.isProUser = function() {

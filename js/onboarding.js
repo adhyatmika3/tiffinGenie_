@@ -46,64 +46,79 @@ document.addEventListener("DOMContentLoaded", () => {
 
         console.log("[ONBOARDING] Profile data:", userProfile);
 
-        // Save to localStorage IMMEDIATELY (this is the source of truth)
-        localStorage.setItem("userEmail", email);
-        localStorage.setItem("userProfile", JSON.stringify(userProfile));
-        console.log("[ONBOARDING] Profile saved to localStorage ✅");
-
-        feedback.innerText = "Profile saved! Setting up your dashboard... ⏳";
+        feedback.innerText = "Saving your profile... ⏳";
         feedback.style.color = "#333";
 
-        // Try backend registration (optional, non-blocking)
+        // --- NEW SECURE FLOW ---
         try {
-            const authRes = await fetch("http://localhost:5000/api/auth/signup", {
+            // 1. Attempt Signup (or Update if already logged in)
+            const token = localStorage.getItem("token");
+            const signupRes = await fetch("http://127.0.0.1:5001/api/auth/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name: childName, email })
+                body: JSON.stringify({ name: childName, email: email })
             });
 
-            const authData = await authRes.json();
-            console.log("[ONBOARDING] Backend signup response:", authData);
+            const signupData = await signupRes.json();
 
-            if (authRes.ok) {
-                localStorage.setItem("token", authData.token);
-                localStorage.setItem("user", JSON.stringify({
-                    name: authData.name,
-                    email: authData.email,
-                    _id: authData._id
-                }));
+            if (signupRes.ok || signupRes.status === 400) {
+                // If 400 and message contains 'registered', it might be okay if we are just completing profile
+                if (signupRes.status === 400 && !signupData.message.includes("registered")) {
+                    throw new Error(signupData.message || "Signup failed");
+                }
 
-                // Try creating child profile on backend
-                try {
-                    await fetch("http://localhost:5000/api/child", {
+                // If we got a new token/user, save it
+                if (signupData.token) {
+                    localStorage.setItem("token", signupData.token);
+                    localStorage.setItem("userRole", signupData.role || "user");
+                    localStorage.setItem("user", JSON.stringify({
+                        name: signupData.name,
+                        email: signupData.email,
+                        _id: signupData._id
+                    }));
+                }
+
+                // 2. Save Child Profile to Backend
+                const activeToken = localStorage.getItem("token") || token;
+                const userId = signupData._id || (JSON.parse(localStorage.getItem("user")) || {})._id;
+
+                if (activeToken && userId) {
+                    await fetch("http://127.0.0.1:5001/api/child", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": `Bearer ${authData.token}`
+                            "Authorization": `Bearer ${activeToken}`
                         },
                         body: JSON.stringify({
-                            userId: authData._id,
+                            userId: userId,
                             name: childName,
                             age: childAge,
                             diet: childDiet,
                             allergies: allergiesArray
                         })
                     });
-                    console.log("[ONBOARDING] Child profile sent to backend");
-                } catch (childErr) {
-                    console.warn("[ONBOARDING] Child profile backend save skipped:", childErr.message);
                 }
+
+                // SUCCESS: Save locally and redirect
+                localStorage.setItem("userEmail", email);
+                localStorage.setItem("userProfile", JSON.stringify(userProfile));
+                
+                feedback.innerText = "Profile created! Welcome to the family. ✅";
+                feedback.style.color = "green";
+                setTimeout(() => window.location.href = "dashboard.html", 1000);
+
+            } else {
+                feedback.innerText = signupData.message || "Something went wrong. Please try again.";
+                feedback.style.color = "#ef4444";
             }
         } catch (err) {
-            console.warn("[ONBOARDING] Backend unreachable, continuing with localStorage:", err.message);
+            console.warn("[ONBOARDING] Backend error, using local fallback:", err.message);
+            // Fallback for offline/demo: Save locally anyway so they can see the UI
+            localStorage.setItem("userEmail", email);
+            localStorage.setItem("userProfile", JSON.stringify(userProfile));
+            feedback.innerText = "Profile saved locally (Offline Mode). Redirecting... ✅";
+            feedback.style.color = "orange";
+            setTimeout(() => window.location.href = "dashboard.html", 1000);
         }
-
-        // Always redirect to dashboard
-        feedback.innerText = "Profile created! Redirecting... ✅";
-        feedback.style.color = "green";
-
-        setTimeout(() => {
-            window.location.href = "dashboard.html";
-        }, 800);
     });
 });

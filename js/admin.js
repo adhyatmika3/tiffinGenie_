@@ -1,188 +1,189 @@
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("[ADMIN] Console v1.2 Initialized");
     
-    // Hardcoded simple admin gate
-    let isAdmin = sessionStorage.getItem("adminAccess");
-    if(!isAdmin) {
-        let code = prompt("Enter Owner Access Password:");
-        if(code === "admin123") {
-            sessionStorage.setItem("adminAccess", "true");
-        } else {
-            alert("Access Denied");
-            window.location.href = "index.html";
-            return;
-        }
+    const token = localStorage.getItem("token");
+    if (!token) {
+        window.location.href = "login.html";
+        return;
     }
 
-    // --- OFFLINE SYNC HANDLERS ---
-    const getLocalMeals = () => {
-        const stored = localStorage.getItem("admin_mealsDB");
-        return stored ? JSON.parse(stored) : [];
-    };
-
-    const saveLocalMeals = (meals) => {
-        localStorage.setItem("admin_mealsDB", JSON.stringify(meals));
-    };
-
-    const loadMeals = async () => {
-        const tbody = document.getElementById("mealsTableBody");
-        tbody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
-        
-        let meals = [];
-        let isOffline = false;
-        
+    // --- GLOBAL DATA HANDLERS ---
+    window.loadMeals = async () => {
+        const container = document.getElementById("inventory-container");
+        if(!container) return;
         try {
-            const res = await fetch("http://localhost:5000/api/meals");
-            if (!res.ok) throw new Error("Server Offline");
-            meals = await res.json();
-            // Cache successfully verified server meals back to local backup
-            saveLocalMeals(meals);
-        } catch (e) {
-            isOffline = true;
-            meals = getLocalMeals();
-        }
-        
-        tbody.innerHTML = "";
-        
-        if (isOffline) {
-            const tr = document.createElement("tr");
-            tr.innerHTML = "<td colspan='5' style='color:#ff7aa2; font-weight:600; text-align:center; background:#fff0f5;'>⚠️ Running in offline mode (Saving to LocalStorage)</td>";
-            tbody.appendChild(tr);
-        }
+            const res = await fetch("http://127.0.0.1:5001/api/meals", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const meals = await res.json();
+            
+            container.innerHTML = "";
+            const times = ['Breakfast', 'Lunch', 'Dinner'];
+            
+            times.forEach(time => {
+                const group = meals.filter(m => m.mealTime === time);
+                const section = document.createElement("div");
+                section.className = "meal-group";
+                section.innerHTML = `<h4>${time} Items (${group.length})</h4>`;
+                
+                if (group.length === 0) {
+                    section.innerHTML += `<p style="padding:10px; font-size:12px; color:#94a3b8;">No items for ${time}.</p>`;
+                } else {
+                    const table = document.createElement("table");
+                    table.innerHTML = `
+                        <thead><tr><th>Name</th><th>Type</th><th>Diet</th><th>Action</th></tr></thead>
+                        <tbody>${group.map(m => `
+                            <tr>
+                                <td>${m.name}</td>
+                                <td><span style="font-size:11px; color:#64748b;">${m.type}</span></td>
+                                <td><span class="badge ${m.diet === 'veg' ? 'badge-veg' : 'badge-nonveg'}">${m.diet}</span></td>
+                                <td><button class="delete-btn" onclick="deleteMeal('${m._id}')">Delete</button></td>
+                            </tr>
+                        `).join('')}</tbody>
+                    `;
+                    section.appendChild(table);
+                }
+                container.appendChild(section);
+            });
+            document.getElementById("stat-meals").innerText = meals.length;
+        } catch (e) { console.error(e); }
+    };
 
-        if (meals.length === 0) {
-            tbody.innerHTML += "<tr><td colspan='5'>No meals found in Database.</td></tr>";
+    window.loadUsers = async () => {
+        const tbody = document.getElementById("usersTableBody");
+        if(!tbody) return;
+        try {
+            const res = await fetch("http://127.0.0.1:5001/api/auth/users", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const users = await res.json();
+            tbody.innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.name || u.email.split('@')[0]}</td>
+                    <td>${u.email}</td>
+                    <td><span class="badge ${u.role === 'admin' ? 'badge-veg' : ''}">${u.role}</span></td>
+                    <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+            document.getElementById("stat-users").innerText = users.length;
+        } catch (e) { console.error(e); }
+    };
+
+    window.loadFeedback = async () => {
+        const list = document.getElementById("feedback-list");
+        if (!list) return;
+        try {
+            const res = await fetch("http://127.0.0.1:5001/api/support/tickets", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.length === 0) {
+                list.innerHTML = "<p style='color: #64748b; text-align: center; padding: 40px;'>No feedback received yet.</p>";
+                return;
+            }
+            list.innerHTML = data.map(f => `
+                <div style="padding:15px; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:12px; background:white;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="font-weight:600; font-size:14px; color:#1e293b;">${f.parentName}</span>
+                        <span style="font-size:11px; color:#64748b; font-weight:600;">#TG-${f._id.slice(-5).toUpperCase()}</span>
+                    </div>
+                    <p style="font-size:11px; color:#2563eb; margin-bottom:10px; font-weight:700; text-transform:uppercase;">Topic: ${f.topic}</p>
+                    <p style="font-size:13px; color:#334155; line-height:1.5;">${f.message}</p>
+                    <div style="margin-top:10px; padding-top:10px; border-top:1px solid #f1f5f9;">
+                        ${f.adminResponse ? 
+                            `<div style="background:#f8fafc; padding:10px; border-radius:8px; border-left:3px solid #10b981; font-size:12px; color:#475569;">
+                                <strong>Your Reply:</strong> ${f.adminResponse}
+                            </div>` :
+                            `<div style="display:flex; flex-direction:column; gap:8px;">
+                                <textarea id="reply-${f._id}" placeholder="Type your reply here..." style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px; resize:vertical; min-height:60px; font-family:inherit;"></textarea>
+                                <button onclick="submitReply('${f._id}')" style="align-self:flex-end; background:#ff7aa2; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:600;">Send Reply</button>
+                            </div>`
+                        }
+                    </div>
+                    <div style="margin-top:10px; font-size:11px; color:#94a3b8; text-align:right;">
+                        ${new Date(f.createdAt).toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) { console.error(e); }
+    };
+
+    window.submitReply = async (id) => {
+        const replyInput = document.getElementById(`reply-${id}`);
+        const response = replyInput.value.trim();
+        if (!response) {
+            alert("Please type a reply first.");
             return;
         }
-        
-        meals.forEach(m => {
-            let ingStr = m.ingredients && m.ingredients.length > 0 ? m.ingredients.join(", ") : "None";
-            let trueId = m._id || m.localId; // Dynamic id fetch mechanism
-            tbody.innerHTML += `
-                <tr>
-                    <td>${m.name}</td>
-                    <td>${m.type}</td>
-                    <td style="text-transform:capitalize">${m.diet}</td>
-                    <td>${ingStr}</td>
-                    <td><button class="delete-btn" onclick="deleteMeal('${trueId}')">Delete</button></td>
-                </tr>
-            `;
-        });
+
+        try {
+            const res = await fetch(`http://127.0.0.1:5001/api/support/reply/${id}`, {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ response })
+            });
+
+            if (res.ok) {
+                alert("Reply sent successfully!");
+                window.loadFeedback(); // Refresh the list
+            } else {
+                alert("Failed to send reply.");
+            }
+        } catch (err) {
+            console.error("Reply Error:", err);
+            alert("Connection error.");
+        }
     };
-    
-    // Add Meal Logic
+
+    window.refreshViewData = (viewId) => {
+        console.log("[ADMIN] Refreshing View:", viewId);
+        if (viewId === 'meal-engine') window.loadMeals();
+        if (viewId === 'managed-users') window.loadUsers();
+        if (viewId === 'user-feedback') window.loadFeedback();
+    };
+
+    // Add Meal
     const addForm = document.getElementById("addMealForm");
-    if(addForm) {
-        addForm.addEventListener("submit", async(e) => {
+    if (addForm) {
+        addForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const nm = document.getElementById("mName").value;
-            const ty = document.getElementById("mType").value;
-            const dt = document.getElementById("mDiet").value;
-            const igRaw = document.getElementById("mIng").value;
-            
             const payload = {
-                name: nm,
-                type: ty,
-                diet: dt,
-                ingredients: igRaw ? igRaw.split(",").map(i=>i.trim()) : []
+                name: document.getElementById("mName").value,
+                mealTime: document.getElementById("mTime").value,
+                type: document.getElementById("mType").value,
+                diet: document.getElementById("mDiet").value,
+                ingredients: document.getElementById("mIngredients").value.split(",").map(i => i.trim())
             };
-            
             try {
-                const res = await fetch("http://localhost:5000/api/meals", {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                const res = await fetch("http://127.0.0.1:5001/api/meals", {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify(payload)
                 });
-                
-                if(!res.ok) throw new Error("Add failed");
-                alert("Meal successfully added to Backend MongoDB!");
-            } catch (error) {
-                // Offline LocalStorage Fallback Injection
-                const fallbackCache = getLocalMeals();
-                payload.localId = "tmplocal_" + Date.now();
-                fallbackCache.push(payload);
-                saveLocalMeals(fallbackCache);
-            } finally {
-                addForm.reset();
-                loadMeals();
-            }
+                if (res.ok) {
+                    addForm.reset();
+                    window.loadMeals();
+                }
+            } catch (err) { console.error(err); }
         });
     }
 
-    // Attach to window so onclick works globally
     window.deleteMeal = async (id) => {
-        if(confirm("Are you sure you want to delete this meal?")) {
-            try {
-                if(id.startsWith("tmplocal_")) throw new Error("Local Unsynced Item");
-                const res = await fetch(`http://localhost:5000/api/meals/${id}`, { method: 'DELETE' });
-                if(!res.ok) throw new Error("Delete failed.");
-            } catch (e) {
-                // Offline LocalStorage Purger Fallback
-                let fallbackCache = getLocalMeals();
-                fallbackCache = fallbackCache.filter(m => (m._id !== id && m.localId !== id));
-                saveLocalMeals(fallbackCache);
-            } finally {
-                loadMeals();
-            }
-        }
+        if (!confirm("Delete this item?")) return;
+        try {
+            await fetch(`http://127.0.0.1:5001/api/meals/${id}`, {
+                method: "DELETE",
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            window.loadMeals();
+        } catch (err) { console.error(err); }
     };
 
-    const loadFeedbacks = () => {
-        const tbody = document.getElementById("feedbackTableBody");
-        if (!tbody) return;
-        
-        const feedbacks = JSON.parse(localStorage.getItem("siteFeedbacks") || "[]");
-        
-        if (feedbacks.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:30px; color:#9ca3af;'>No feedback messages yet.</td></tr>";
-            return;
-        }
-        
-        tbody.innerHTML = "";
-        feedbacks.forEach(f => {
-            tbody.innerHTML += `
-                <tr>
-                    <td style="font-size:12px; color:#6b7280;">${f.date}</td>
-                    <td>
-                        <div style="font-weight:600;">${f.name}</div>
-                        <div style="font-size:12px; color:#6aa9ff;">${f.email}</div>
-                    </td>
-                    <td style="font-weight:500;">${f.subject}</td>
-                    <td style="font-size:13px; color:#4b5563; max-width:300px; line-height:1.4;">${f.message}</td>
-                    <td>
-                        <span style="padding:4px 8px; border-radius:12px; background:${f.status==='Replied'?'#d1fae5':'#fef3c7'}; color:${f.status==='Replied'?'#065f46':'#92400e'}; font-size:11px; font-weight:600;">${f.status}</span>
-                    </td>
-                    <td>
-                        <button onclick="replyFeedback(${f.id})" style="background:#6aa9ff; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:11px;">Reply</button>
-                    </td>
-                </tr>
-            `;
-        });
-    };
-
-    window.replyFeedback = (id) => {
-        const feedbacks = JSON.parse(localStorage.getItem("siteFeedbacks") || "[]");
-        const fb = feedbacks.find(item => item.id === id);
-        if (!fb) return;
-
-        const reply = prompt(`Reply to ${fb.name} (${fb.email}):\n\nUser Message: "${fb.message}"`);
-        if (reply && reply.trim() !== "") {
-            fb.adminReply = reply;
-            fb.status = "Replied";
-            fb.replyDate = new Date().toLocaleString();
-            localStorage.setItem("siteFeedbacks", JSON.stringify(feedbacks));
-            alert("Response sent to User's Dashboard!");
-            loadFeedbacks();
-        }
-    };
-
-    window.clearAllFeedback = () => {
-        if (confirm("Are you sure you want to clear all user feedback? This cannot be undone.")) {
-            localStorage.removeItem("siteFeedbacks");
-            loadFeedbacks();
-        }
-    };
-
-    // Initial Execute
-    loadMeals();
-    loadFeedbacks();
+    // Initial Load
+    window.loadMeals();
+    window.loadUsers();
+    window.loadFeedback();
 });

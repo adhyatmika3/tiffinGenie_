@@ -137,20 +137,32 @@ function getCommunityMeals() {
 }
 
 // ─── GENERATE WEEKLY PLAN ──────────────────────────────────────────────────────
-function generateWeeklyPlan(profile) {
+function generateWeeklyPlan(profile, livePool) {
     var cuisine  = profile.cuisine || (profile.diet === "non-veg" ? "indian_nonveg" : "indian_veg");
     var allergies = profile.allergies || [];
 
-    console.log("[ENGINE] Profile:", profile);
-    console.log("[ENGINE] Cuisine:", cuisine);
+    console.log("[ENGINE] Generating plan with Live Data...");
 
     var db     = MEAL_DB[cuisine] || MEAL_DB["indian_veg"];
     var custom = getCustomMeals(cuisine);
     var comm   = getCommunityMeals();
 
-    var breakfasts = filterByAllergy(db.breakfast.concat(custom.breakfast, comm.breakfast), allergies);
-    var lunches    = filterByAllergy(db.lunch.concat(custom.lunch, comm.lunch),         allergies);
-    var dinners    = filterByAllergy(db.dinner.concat(custom.dinner, comm.dinner),       allergies);
+    // Base Static Pools
+    var b_static = db.breakfast.concat(custom.breakfast, comm.breakfast);
+    var l_static = db.lunch.concat(custom.lunch, comm.lunch);
+    var d_static = db.dinner.concat(custom.dinner, comm.dinner);
+
+    // Merge Live Backend Data
+    if (livePool) {
+        b_static = b_static.concat(livePool.breakfast);
+        l_static = l_static.concat(livePool.lunch);
+        d_static = d_static.concat(livePool.dinner);
+    }
+
+    // Filter by Diet and Allergy
+    var breakfasts = filterByAllergy(b_static.filter(m => !profile.diet || m.diet !== "non-veg" || profile.diet === "non-veg"), allergies);
+    var lunches    = filterByAllergy(l_static.filter(m => !profile.diet || m.diet !== "non-veg" || profile.diet === "non-veg"), allergies);
+    var dinners    = filterByAllergy(d_static.filter(m => !profile.diet || m.diet !== "non-veg" || profile.diet === "non-veg"), allergies);
 
     console.log("[ENGINE] Breakfast pool:", breakfasts.map(function(m){ return m.name; }));
     console.log("[ENGINE] Lunch pool:",    lunches.map(function(m){ return m.name; }));
@@ -513,52 +525,91 @@ window.closeAddMealModal = function() {
     if (m) m.style.display = "none";
 };
 
-// ─── GENERATE & SAVE ───────────────────────────────────────────────────────────
-function generateFullPlan() {
+// ─── GENERATE & SAVE (SYNCED WITH BACKEND) ───────────────────────────────────
+async function generateFullPlan() {
     var profileRaw = localStorage.getItem("userProfile");
+    const token = localStorage.getItem("token");
+    
     if (!profileRaw) {
-        alert("No profile found. Please set up your profile first.");
+        alert("Please set up your profile first.");
         window.location.href = "onboarding.html";
         return;
     }
     var profile = JSON.parse(profileRaw);
     
     var genBtn = document.getElementById("generatePlanBtn");
-    var originalHTML = "";
     if (genBtn) {
-        originalHTML = genBtn.innerHTML;
-        genBtn.innerHTML = "<span>⏳</span> Generating...";
+        genBtn.innerHTML = "<span>⏳</span> Syncing Database...";
         genBtn.style.opacity = "0.7";
         genBtn.style.pointerEvents = "none";
     }
 
-    // Small delay to allow UI to render the button change
-    setTimeout(function() {
-        var plan = generateWeeklyPlan(profile);
+    try {
+        console.log("[ENGINE] Fetching live meals from Backend...");
+        const res = await fetch("http://127.0.0.1:5001/api/meals", {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const backendMeals = await res.json();
+        console.log("[ENGINE] Live Meals Received:", backendMeals.length);
+
+        // Map backend meals to engine format
+        const livePool = { breakfast: [], lunch: [], dinner: [] };
+        backendMeals.forEach(m => {
+            const timeKey = (m.mealTime || "Lunch").toLowerCase();
+            if (livePool[timeKey]) {
+                livePool[timeKey].push({
+                    name: m.name,
+                    tags: m.nutritionTags || [m.diet || 'veg'],
+                    diet: m.diet,
+                    custom: true // Mark as dynamic
+                });
+            }
+        });
+
+        // Generate Plan with Live Data + Static DB for richness
+        const plan = await generateWeeklyPlan(profile, livePool);
         localStorage.setItem("weeklyPlan", JSON.stringify(plan));
         renderDashboard(profile, plan);
 
         if (genBtn) {
-            genBtn.innerHTML = "<span>✅</span> Plan Ready!";
-            setTimeout(function() {
-                genBtn.innerHTML = originalHTML;
+            genBtn.innerHTML = "<span>✅</span> Plan Synced!";
+            setTimeout(() => {
+                genBtn.innerHTML = "<span>✨</span> Regenerate Weekly Plan";
                 genBtn.style.opacity = "1";
                 genBtn.style.pointerEvents = "auto";
             }, 1200);
         }
-    }, 150);
+    } catch (err) {
+        console.error("[ENGINE] Sync Failed:", err);
+        alert("Could not sync with Database. Using offline mode.");
+        
+        // Fallback to offline generation
+        const plan = generateWeeklyPlan(profile, null);
+        localStorage.setItem("weeklyPlan", JSON.stringify(plan));
+        renderDashboard(profile, plan);
+    }
 }
 
 // ─── INIT ──────────────────────────────────────────────────────────────────────
 function initDashboard() {
     console.log("[DASHBOARD] Initializing...");
-    var profileRaw = localStorage.getItem("userProfile");
-    if (!profileRaw) {
-        console.warn("[DASHBOARD] No profile, redirecting to login");
+    
+    const token = localStorage.getItem("token");
+    const profileRaw = localStorage.getItem("userProfile");
+
+    if (!token && !profileRaw) {
+        console.warn("[DASHBOARD] No session found, redirecting to login");
         window.location.href = "login.html";
         return;
     }
-    var profile = JSON.parse(profileRaw);
+
+    if (!profileRaw) {
+        console.warn("[DASHBOARD] Authenticated but no profile, redirecting to onboarding");
+        window.location.href = "onboarding.html";
+        return;
+    }
+
+    const profile = JSON.parse(profileRaw);
     console.log("[DASHBOARD] Profile:", profile);
 
     var titleEl = document.getElementById("childNameTitle");

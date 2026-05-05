@@ -2,6 +2,43 @@ const express = require('express');
 const router = express.Router();
 const Contact = require('../models/Contact');
 const Subscription = require('../models/Subscription');
+const Feedback = require('../models/Feedback');
+
+// @desc    Submit professional feedback/helpdesk ticket
+// @route   POST /api/feedback
+router.post('/feedback', async (req, res) => {
+    try {
+        const { parentName, parentEmail, topic, message } = req.body;
+        if (!parentName || !parentEmail || !message) {
+            return res.status(400).json({ message: 'Missing name, email, or message.' });
+        }
+        const feedback = await Feedback.create({ 
+            parentName, 
+            parentEmail, 
+            topic: topic || 'General Help', 
+            message 
+        });
+        res.status(201).json(feedback);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+const { protect } = require('../middleware/authMiddleware');
+
+// @desc    Get all feedback (Admin only)
+// @route   GET /api/feedback
+router.get('/feedback', protect, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Not authorized' });
+        }
+        const feedbacks = await Feedback.find({}).sort({ createdAt: -1 });
+        res.json(feedbacks);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 // @desc    Store new contact message
 // @route   POST /api/contact
