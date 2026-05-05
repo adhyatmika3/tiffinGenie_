@@ -51,7 +51,12 @@ async function initSession() {
         if (userProfile) {
             try {
                 const profile = JSON.parse(userProfile);
-                displayName = profile.name || profile.email?.split("@")[0] || "User";
+                displayName = profile.parentName || profile.childName || profile.email?.split("@")[0] || "User";
+            } catch (e) {}
+        } else if (localStorage.getItem("user")) {
+            try {
+                const userObj = JSON.parse(localStorage.getItem("user"));
+                displayName = userObj.name || displayName;
             } catch (e) {}
         } else if (userEmail) {
             displayName = userEmail.split("@")[0];

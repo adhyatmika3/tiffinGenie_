@@ -31,6 +31,10 @@
             
             <form id="childProfileForm">
                 <div class="form-group">
+                    <label>Parent's Name</label>
+                    <input type="text" id="parentName" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
                     <label>Parent Email</label>
                     <input type="email" id="parentEmail" placeholder="Enter your email" required>
                 </div>
@@ -93,17 +97,23 @@
                 return;
             }
 
-            // Pre-fill email from login
+            // Pre-fill from login
             var savedEmail = localStorage.getItem("userEmail");
+            var savedUser = JSON.parse(localStorage.getItem("user") || "{}");
             if (savedEmail) {
                 document.getElementById("parentEmail").value = savedEmail;
                 console.log("[ONBOARDING] Pre-filled email:", savedEmail);
+            }
+            if (savedUser.name) {
+                document.getElementById("parentName").value = savedUser.name;
+                console.log("[ONBOARDING] Pre-filled name:", savedUser.name);
             }
 
             form.onsubmit = function(e) {
                 e.preventDefault();
                 console.log("[ONBOARDING] Form submitted!");
 
+                var parentName = document.getElementById("parentName").value.trim();
                 var email = document.getElementById("parentEmail").value.trim().toLowerCase();
                 var childName = document.getElementById("childName").value.trim();
                 var childAge = Number(document.getElementById("childAge").value);
@@ -112,15 +122,16 @@
                 var allergiesArray = rawAllergies ? rawAllergies.split(",").map(function(a) { return a.trim(); }).filter(Boolean) : [];
                 var childCuisine = document.getElementById("childCuisine").value;
 
-                if (!email || !childName || !childAge) {
+                if (!parentName || !email || !childName || !childAge) {
                     feedback.innerText = "Please fill all required fields.";
                     feedback.style.color = "orange";
                     return;
                 }
 
                 var userProfile = {
+                    parentName: parentName,
                     email: email,
-                    name: childName,
+                    childName: childName,
                     age: childAge,
                     diet: childDiet,
                     cuisine: childCuisine,
