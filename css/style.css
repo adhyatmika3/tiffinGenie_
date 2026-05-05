@@ -49,7 +49,7 @@ nav {
 }
 
 .nav-logo-section {
-    flex: 0 0 200px; /* Fixed width to prevent shifting */
+    flex: 1; /* Take equal space to balance auth section */
     display: flex;
     justify-content: flex-start;
 }
@@ -68,7 +68,7 @@ nav ul {
     list-style: none;
     margin: 0;
     padding: 0;
-    flex: 1; /* Grow to take center space */
+    flex: 2; /* Ensure menu has enough space and stays centered */
     justify-content: center;
 }
 
@@ -80,7 +80,6 @@ nav a {
     transition: 0.3s;
     position: relative;
     padding: 5px 0;
-    white-space: nowrap;
 }
 
 nav a::after {
@@ -98,7 +97,7 @@ nav a:hover { color: #ff7aa2; }
 nav a:hover::after, nav a.active::after { width: 100%; }
 
 #navUserSection {
-    flex: 0 0 200px; /* Fixed width matching logo section to ensure center stays center */
+    flex: 1; /* Take equal space to balance logo section */
     display: flex;
     align-items: center;
     gap: 15px;
