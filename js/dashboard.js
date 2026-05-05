@@ -562,7 +562,10 @@ function initDashboard() {
     console.log("[DASHBOARD] Profile:", profile);
 
     var titleEl = document.getElementById("childNameTitle");
-    if (titleEl) titleEl.innerText = " \u2013 " + profile.name;
+    if (titleEl) {
+        var childName = profile.childName || profile.name || "Kid";
+        titleEl.innerText = " \u2013 " + childName;
+    }
 
     var realityToggle = document.getElementById("realityModeToggle");
     if (realityToggle) {

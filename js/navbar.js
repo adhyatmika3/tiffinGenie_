@@ -40,5 +40,9 @@ function injectNavbar() {
     }
 }
 
-// Automatically inject on load
-document.addEventListener("DOMContentLoaded", injectNavbar);
+// Automatically inject immediately
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", injectNavbar);
+} else {
+    injectNavbar();
+}

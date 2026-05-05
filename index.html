@@ -8,12 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/home.css">
-    <script>
-        // Automatic Login Check
-        if (localStorage.getItem("userProfile")) {
-            window.location.href = "dashboard.html";
-        }
-    </script>
+
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -32,10 +27,21 @@
         <div class="reveal">
             <h1>Your Child's <span>Healthiest Week</span> Starts Here.</h1>
             <p>TiffinGenie uses smart AI to build personalized, balanced meal plans from real Indian home recipes — so mornings are stress-free and tiffins are nutritious.</p>
-            <div class="hero-cta">
-                <button class="btn btn-primary" onclick="window.location.href='onboarding.html'">Get Started Free</button>
+            <div class="hero-cta" id="heroCtaBlock">
+                <button class="btn btn-primary" id="mainHeroBtn" onclick="window.location.href='onboarding.html'">Get Started Free</button>
                 <button class="btn btn-outline" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See How It Works ↓</button>
             </div>
+            <script>
+                (function() {
+                    if (localStorage.getItem("userProfile")) {
+                        var btn = document.getElementById("mainHeroBtn");
+                        if (btn) {
+                            btn.innerText = "Go to Dashboard 📊";
+                            btn.onclick = function() { window.location.href = 'dashboard.html'; };
+                        }
+                    }
+                })();
+            </script>
         </div>
 
         <!-- Live Dashboard Mockup -->
