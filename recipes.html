@@ -7,6 +7,7 @@
     <meta name="description" content="Browse our entire library of healthy, child-approved recipes. Favorite meals to prioritize them in your weekly plan.">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
     <style>
         .recipe-hero {
             padding-top: 120px;
@@ -247,6 +248,7 @@
         var showFavsOnly = false;
 
         window.openAddRecipeModal = function() {
+            if (!window.checkProAccess("Mamma's Kitchen Community")) return;
             document.getElementById("addRecipeModal").style.display = "flex";
         };
 

@@ -3,275 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TiffinGenie | Smart Nutrition for Kids</title>
+    <title>TiffinGenie | Smart AI Nutrition for Kids</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
     <style>
-        body {
-            position: relative;
-            overflow-x: hidden;
-        }
-        /* Soft blur circles for visual interest */
-        .bg-circle-1, .bg-circle-2 {
+        body { overflow-x: hidden; background: #fff; margin: 0; }
+        
+        /* Modern Background Blobs */
+        .blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
+            filter: blur(100px);
             z-index: -1;
-            opacity: 0.4;
-            animation: float 8s ease-in-out infinite alternate;
+            opacity: 0.25;
+            animation: moveBlob 15s infinite alternate ease-in-out;
         }
-        .bg-circle-1 {
-            width: 400px; height: 400px;
-            background: #ffb6cb;
-            top: -100px; left: -100px;
-        }
-        .bg-circle-2 {
-            width: 500px; height: 500px;
-            background: #dbeafe;
-            top: 200px; right: -150px;
-            animation-delay: 2s;
-        }
-        @keyframes float {
-            0% { transform: translateY(0px) translateX(0px); }
-            100% { transform: translateY(30px) translateX(-20px); }
+        .blob-1 { width: 600px; height: 600px; background: #ff7aa2; top: -200px; left: -100px; }
+        .blob-2 { width: 500px; height: 500px; background: #6aa9ff; top: 400px; right: -150px; animation-delay: -5s; }
+        
+        @keyframes moveBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 80px) scale(1.1); }
         }
 
-        .hero {
-            padding: 100px 20px 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+        /* Hero Section Styling */
+        .hero-container {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
             align-items: center;
-            text-align: center;
+            gap: 40px;
+            padding: 160px 8% 100px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        .hero h1 {
-            font-size: 56px;
-            line-height: 1.1;
-            background: linear-gradient(90deg, #ff7aa2, #6aa9ff);
+        
+        .hero-text h1 {
+            font-size: 72px;
+            line-height: 1.05;
+            font-family: 'Fredoka';
+            color: #111827;
+            margin-bottom: 25px;
+        }
+        .hero-text h1 span {
+            background: linear-gradient(135deg, #ff7aa2, #ffb1c1);
             -webkit-background-clip: text;
             color: transparent;
-            margin-bottom: 20px;
-            font-family: 'Fredoka';
-            max-width: 800px;
         }
-        .hero p {
-            font-size: 20px;
-            color: #4b5563;
-            max-width: 600px;
+        .hero-text p {
+            font-size: 22px;
+            color: #6b7280;
             margin-bottom: 40px;
-            font-weight: 400;
+            line-height: 1.6;
+            max-width: 550px;
         }
-        .hero-btns {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
+        
+        .hero-image {
+            position: relative;
+            animation: float 6s infinite ease-in-out;
         }
-        .btn-secondary {
-            background: #fff;
-            color: #374151;
-            border: 2px solid #e5e7eb;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+        .hero-image img {
+            width: 100%;
+            border-radius: 40px;
+            box-shadow: 0 50px 100px rgba(0,0,0,0.1);
         }
-        .btn-secondary:hover {
-            border-color: #d1d5db;
-            background: #f9fafb;
-            transform: translateY(-2px);
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
 
-        /* Mock Preview */
-        .mock-preview {
-            margin-top: 60px;
+        /* Social Proof Stats Bar */
+        .stats-bar {
             background: #fff;
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-            border: 1px solid #f3f4f6;
-            max-width: 800px;
-            width: 100%;
+            padding: 30px;
+            border-radius: 30px;
             display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
+            justify-content: space-around;
+            max-width: 1000px;
+            margin: -50px auto 100px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.06);
+            border: 1px solid #f3f4f6;
+            position: relative;
+            z-index: 10;
         }
-        .mock-card {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 14px;
-            padding: 15px;
-            flex: 1;
-            min-width: 140px;
+        .stat-item { text-align: center; }
+        .stat-item h4 { font-family: 'Fredoka'; font-size: 32px; color: #ff7aa2; margin: 0; }
+        .stat-item p { font-size: 14px; color: #6b7280; margin: 5px 0 0; font-weight: 500; }
+
+        /* Feature Cards */
+        .features-section { padding: 100px 8%; text-align: center; }
+        .section-tag { font-weight: 700; color: #ff7aa2; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
+        .section-title { font-family: 'Fredoka'; font-size: 44px; margin: 15px 0 60px; }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
+            padding: 50px 35px;
+            border-radius: 35px;
+            border: 1px solid #f0f0f0;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-align: left;
         }
-        .mock-card h4 { font-family: 'Fredoka'; color: #ff7aa2; font-size: 16px; margin: 0 0 10px 0; }
-        .mock-meal { font-size: 13px; color: #374151; margin-bottom: 8px; display: flex; align-items: center; gap: 5px;}
-        
-        /* Steps */
-        .steps-section {
-            padding: 80px 20px;
-            text-align: center;
-        }
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            margin-top: 40px;
-            max-width: 1000px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .step-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .step-icon {
-            width: 60px; height: 60px;
-            background: #fff0f5;
-            color: #ff7aa2;
-            border-radius: 16px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 28px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 20px rgba(255,122,162,0.1);
-        }
-        .step-item h3 { font-family: 'Fredoka'; font-size: 20px; color: #111827; margin-bottom: 10px; }
-        .step-item p { color: #6b7280; font-size: 15px; }
-
-        /* Value Section */
-        .value-section {
+        .feature-card:hover {
+            transform: translateY(-15px);
             background: #fff;
-            border-radius: 30px;
-            padding: 60px 40px;
-            margin: 0 20px 40px 20px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-            border: 1px solid #f3f4f6;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+            border-color: #ff7aa2;
         }
-        .value-grid {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 30px;
-        }
-        .value-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #f9fafb;
-            padding: 12px 20px;
-            border-radius: 100px;
-            color: #374151;
-            font-weight: 500;
-            font-size: 15px;
-        }
-        
-        .cta-section {
-            text-align: center;
-            padding: 40px 20px 100px;
+        .feature-icon { font-size: 50px; margin-bottom: 25px; display: block; }
+        .feature-card h3 { font-family: 'Fredoka'; font-size: 24px; margin-bottom: 15px; color: #111827; }
+        .feature-card p { color: #6b7280; font-size: 15px; line-height: 1.6; }
+
+        /* Animated Entry */
+        .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 1024px) {
+            .hero-container { grid-template-columns: 1fr; text-align: center; padding-top: 120px; }
+            .hero-text h1 { font-size: 50px; }
+            .hero-text p { margin: 0 auto 40px; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .stats-bar { flex-direction: column; gap: 30px; margin: 0 20px 60px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="bg-circle-1"></div>
-    <div class="bg-circle-2"></div>
-
     <div id="navbar-placeholder"></div>
 
-    <div class="container">
-        <!-- 1. HERO SECTION -->
-        <section class="hero">
-            <h1>Plan Healthy Tiffins in Seconds</h1>
-            <p>Personalized meal plans for your child, based on real home food.</p>
-            <div class="hero-btns">
-                <button class="btn btn-primary" onclick="window.location.href='recipes.html'">View Recipes</button>
-                <button class="btn btn-secondary" onclick="window.location.href='how-it-works.html'">View Demo</button>
-            </div>
+    <!-- Background Decoration -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
 
-            <!-- 5. MINI PREVIEW -->
-            <div id="demoPreview" class="mock-preview">
-                <div class="mock-card">
-                    <h4>Monday</h4>
-                    <div class="mock-meal">🌅 Poha</div>
-                    <div class="mock-meal">☀️ Dal Roti</div>
-                    <div class="mock-meal">🌙 Khichdi</div>
-                </div>
-                <div class="mock-card">
-                    <h4>Tuesday</h4>
-                    <div class="mock-meal">🌅 Idli Sambar</div>
-                    <div class="mock-meal">☀️ Paneer Sabzi</div>
-                    <div class="mock-meal">🌙 Moong Soup</div>
-                </div>
-                <div class="mock-card">
-                    <h4>Wednesday</h4>
-                    <div class="mock-meal">🌅 Aloo Paratha</div>
-                    <div class="mock-meal">☀️ Rajma Chawal</div>
-                    <div class="mock-meal">🌙 Sabzi Roti</div>
-                </div>
+    <!-- HERO SECTION -->
+    <section class="hero-container">
+        <div class="hero-text reveal">
+            <h1>Healthy Meals, <span>Smarter Mornings.</span></h1>
+            <p>The #1 AI-powered nutrition platform for Indian parents. Plan, track, and optimize your child's tiffins in seconds.</p>
+            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="window.location.href='recipes.html'" style="padding: 18px 45px; font-size: 18px; border-radius: 50px; box-shadow: 0 15px 30px rgba(255,122,162,0.3);">View Recipes</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})" style="padding: 18px 35px; border-radius: 50px; font-size: 18px; background:#fff; border:1px solid #e5e7eb; cursor:pointer;">How It Works</button>
             </div>
-        </section>
-
-        <!-- 3. HOW IT WORKS -->
-        <section class="steps-section">
-            <h2 style="font-family:'Fredoka'; font-size: 32px; color: #111827;">How It Works</h2>
-            <div class="steps-grid">
-                <div class="step-item">
-                    <div class="step-icon">👤</div>
-                    <h3>1. Setup Profile</h3>
-                    <p>Enter your child's age, dietary preferences, and allergies.</p>
+        </div>
+        <div class="hero-image reveal" style="display: flex; align-items: center; justify-content: center; height: 500px;">
+            <div class="tiffin-scene">
+                <!-- Tiffin Base with Food -->
+                <div class="tiffin-base">
+                    <div class="food-emoji" id="food1">🥪</div>
+                    <div class="food-emoji" id="food2">🍎</div>
+                    <div class="food-emoji" id="food3">🥕</div>
                 </div>
-                <div class="step-item">
-                    <div class="step-icon">✨</div>
-                    <h3>2. Get Weekly Plan</h3>
-                    <p>Our intelligent engine instantly creates a balanced 7-day menu.</p>
-                </div>
-                <div class="step-item">
-                    <div class="step-icon">⇄</div>
-                    <h3>3. Customize Easily</h3>
-                    <p>Swap meals instantly or add your own family favorites.</p>
-                </div>
+                <!-- Tiffin Lid -->
+                <div class="tiffin-lid" id="cssTiffinLid"></div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- 4. SHOW REAL VALUE -->
-        <section class="value-section">
-            <h2 style="font-family:'Fredoka'; font-size: 28px; color: #111827; margin: 0;">Why Parents Love This</h2>
-            <div class="value-grid">
-                <div class="value-item"><span>🍲</span> Real home-style meals</div>
-                <div class="value-item"><span>⏱️</span> Saves daily effort</div>
-                <div class="value-item"><span>📅</span> Works with your routine</div>
-            </div>
-        </section>
+    <style>
+        .tiffin-scene {
+            perspective: 1200px;
+            width: 350px;
+            height: 400px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tiffin-base {
+            position: absolute;
+            bottom: 60px;
+            width: 300px;
+            height: 140px;
+            background: linear-gradient(145deg, #ffffff, #f3f4f6);
+            border-radius: 40px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.08), inset 0 -15px 30px rgba(0,0,0,0.03);
+            border: 4px solid #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 1;
+        }
+        .food-emoji {
+            font-size: 55px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+            opacity: 0;
+            transform: translateY(30px) scale(0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .tiffin-lid {
+            position: absolute;
+            bottom: 180px;
+            width: 300px;
+            height: 120px;
+            background: linear-gradient(135deg, #ff7aa2, #ffb1c1);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px rgba(255,122,162,0.3), inset 0 10px 20px rgba(255,255,255,0.4);
+            border: 4px solid rgba(255,255,255,0.6);
+            transform-origin: bottom center;
+            transition: transform 0.1s linear, opacity 0.1s linear;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .tiffin-lid::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            width: 80px;
+            height: 20px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 10px;
+            box-shadow: 0 5px 10px rgba(255,122,162,0.2);
+        }
+        .tiffin-lid::after {
+            content: 'Genie';
+            font-family: 'Fredoka';
+            color: #fff;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+    </style>
 
-        <!-- 6. CTA SECTION -->
-        <section class="cta-section">
-            <h2 style="font-family:'Fredoka'; font-size: 36px; color: #111827; margin-bottom: 30px;">Start planning smarter meals today</h2>
-            <button onclick="document.getElementById('heroCtaBtn').click()" class="btn-primary" style="font-size: 16px; padding: 12px 40px;">Get Started</button>
-        </section>
+    <!-- STATS BAR -->
+    <div class="stats-bar reveal">
+        <div class="stat-item">
+            <h4>50,000+</h4>
+            <p>Happy Parents</p>
+        </div>
+        <div class="stat-item">
+            <h4>1.2 Million</h4>
+            <p>Meals Generated</p>
+        </div>
+        <div class="stat-item">
+            <h4>4.9/5</h4>
+            <p>App Store Rating</p>
+        </div>
     </div>
+
+    <!-- FEATURES SECTION -->
+    <section id="features" class="features-section">
+        <span class="section-tag">Powerful Features</span>
+        <h2 class="section-title">Designed for Modern Parenting</h2>
+        
+        <div class="feature-grid">
+            <div class="feature-card reveal">
+                <span class="feature-icon">🤖</span>
+                <h3>AI Planner</h3>
+                <p>Personalized meal plans based on your child's age, weight, and favorite home foods.</p>
+            </div>
+            <div class="feature-card reveal">
+                <span class="feature-icon">📊</span>
+                <h3>Health Scores</h3>
+                <p>Real-time nutritional insights for every meal. Balance protein, fiber, and energy perfectly.</p>
+            </div>
+            <div class="feature-card reveal">
+                <span class="feature-icon">🛒</span>
+                <h3>Smart Grocery</h3>
+                <p>Automated shopping lists scaled to your family size. One-click and you're ready to cook.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- THE GENIE GUARANTEE -->
+    <section style="background: #fff0f5; padding: 100px 8%; text-align: center; margin: 80px 5%; border-radius: 60px;">
+        <div style="max-width: 800px; margin: 0 auto;" class="reveal">
+            <h2 style="font-family: 'Fredoka'; font-size: 44px; color: #111827; margin-bottom: 25px;">The Genie Guarantee 🧞‍♂️</h2>
+            <p style="font-size: 20px; color: #4b5563; line-height: 1.8; margin-bottom: 45px;">
+                "We believe every child deserves a healthy start. If TiffinGenie doesn't save you 3 hours a week and make your mornings 100% stress-free, we'll give you your Pro Plan back. No questions asked."
+            </p>
+            <button class="btn btn-primary" onclick="window.location.href='onboarding.html'" style="padding: 18px 45px; border-radius:50px;">Start Your Journey</button>
+        </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
 
     <script src="js/navbar.js"></script>
     <script src="js/session.js"></script>
-    <script src="js/meals_db.js"></script>
-    <script src="js/assistant.js"></script>
     <script src="js/footer.js"></script>
+    <script src="js/assistant.js"></script>
+
     <script>
-        document.getElementById("heroCtaBtn").addEventListener("click", function() {
-            // Check if user is logged in
-            const profile = localStorage.getItem("userProfile");
-            if (profile) {
-                window.location.href = "dashboard.html";
+        // Magic CSS Tiffin Scroll Interaction
+        window.addEventListener("scroll", function() {
+            var lid = document.getElementById("cssTiffinLid");
+            var foods = document.querySelectorAll(".food-emoji");
+            if (!lid) return;
+            
+            var scrollPos = window.scrollY;
+            var maxScroll = 350; // Point where tiffin is fully open
+            
+            // Calculate progress (0 to 1)
+            var progress = scrollPos / maxScroll;
+            if (progress < 0) progress = 0;
+            if (progress > 1) progress = 1;
+            
+            // Animate Lid
+            var rotateAngle = progress * 110; // Open up to 110 degrees
+            var liftY = progress * 60; // Lift up slightly
+            
+            lid.style.transform = `translateY(-${liftY}px) rotateX(${rotateAngle}deg)`;
+            
+            // Fade out lid slightly when fully open for depth
+            lid.style.opacity = 1 - (progress * 0.3);
+
+            // Reveal Food Emojis with a delay effect
+            if (progress > 0.4) {
+                foods.forEach((food, index) => {
+                    setTimeout(() => {
+                        food.style.opacity = "1";
+                        food.style.transform = "translateY(0) scale(1)";
+                    }, index * 100);
+                });
             } else {
-                window.location.href = "onboarding.html";
+                foods.forEach(food => {
+                    food.style.opacity = "0";
+                    food.style.transform = "translateY(30px) scale(0.8)";
+                });
             }
         });
+
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Trigger once on load
+        document.addEventListener("DOMContentLoaded", reveal);
     </script>
 </body>
 </html>

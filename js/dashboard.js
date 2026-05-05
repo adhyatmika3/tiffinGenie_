@@ -729,6 +729,8 @@ function closeGroceryModal() {
 
 // ─── NUTRITION INSIGHTS LOGIC ──────────────────────────────────────────────────
 function openInsightsModal() {
+    if (!window.checkProAccess("Detailed Nutrition Insights")) return;
+
     var rawPlan = localStorage.getItem("weeklyPlan");
     var container = document.getElementById("insightsModalContent");
     if (!container) return;
@@ -931,6 +933,8 @@ function initDashboard() {
 }
 
 window.exportPlanToPDF = function() {
+    if (!window.checkProAccess("PDF Fridge Printout")) return;
+    
     var plan = JSON.parse(localStorage.getItem("weeklyPlan") || "{}");
     var grid = document.getElementById("printGrid");
     var template = document.getElementById("printTemplate");
