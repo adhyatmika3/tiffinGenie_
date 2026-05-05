@@ -3,254 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TiffinGenie | Smart AI Nutrition for Kids</title>
+    <title>TiffinGenie — AI-Powered Meal Planning for Kids</title>
+    <meta name="description" content="Plan healthy, personalized tiffins for your child in seconds. AI-powered weekly meal plans based on real Indian home food.">
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/home.css">
     <link rel="manifest" href="manifest.json">
-    <style>
-        body { overflow-x: hidden; background: #fff; margin: 0; }
-        
-        /* Modern Background Blobs */
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            z-index: -1;
-            opacity: 0.25;
-            animation: moveBlob 15s infinite alternate ease-in-out;
-        }
-        .blob-1 { width: 600px; height: 600px; background: #ff7aa2; top: -200px; left: -100px; }
-        .blob-2 { width: 500px; height: 500px; background: #6aa9ff; top: 400px; right: -150px; animation-delay: -5s; }
-        
-        @keyframes moveBlob {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(100px, 80px) scale(1.1); }
-        }
-
-        /* Hero Section Styling */
-        .hero-container {
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            align-items: center;
-            gap: 40px;
-            padding: 160px 8% 100px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .hero-text h1 {
-            font-size: 72px;
-            line-height: 1.05;
-            font-family: 'Fredoka';
-            color: #111827;
-            margin-bottom: 25px;
-        }
-        .hero-text h1 span {
-            background: linear-gradient(135deg, #ff7aa2, #ffb1c1);
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-        .hero-text p {
-            font-size: 22px;
-            color: #6b7280;
-            margin-bottom: 40px;
-            line-height: 1.6;
-            max-width: 550px;
-        }
-        
-        .hero-image {
-            position: relative;
-            animation: float 6s infinite ease-in-out;
-        }
-        .hero-image img {
-            width: 100%;
-            border-radius: 40px;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.1);
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        /* Social Proof Stats Bar */
-        .stats-bar {
-            background: #fff;
-            padding: 30px;
-            border-radius: 30px;
-            display: flex;
-            justify-content: space-around;
-            max-width: 1000px;
-            margin: -50px auto 100px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.06);
-            border: 1px solid #f3f4f6;
-            position: relative;
-            z-index: 10;
-        }
-        .stat-item { text-align: center; }
-        .stat-item h4 { font-family: 'Fredoka'; font-size: 32px; color: #ff7aa2; margin: 0; }
-        .stat-item p { font-size: 14px; color: #6b7280; margin: 5px 0 0; font-weight: 500; }
-
-        /* Feature Cards */
-        .features-section { padding: 100px 8%; text-align: center; }
-        .section-tag { font-weight: 700; color: #ff7aa2; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
-        .section-title { font-family: 'Fredoka'; font-size: 44px; margin: 15px 0 60px; }
-        
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
-        .feature-card {
-            background: rgba(255,255,255,0.7);
-            backdrop-filter: blur(10px);
-            padding: 50px 35px;
-            border-radius: 35px;
-            border: 1px solid #f0f0f0;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-align: left;
-        }
-        .feature-card:hover {
-            transform: translateY(-15px);
-            background: #fff;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.08);
-            border-color: #ff7aa2;
-        }
-        .feature-icon { font-size: 50px; margin-bottom: 25px; display: block; }
-        .feature-card h3 { font-family: 'Fredoka'; font-size: 24px; margin-bottom: 15px; color: #111827; }
-        .feature-card p { color: #6b7280; font-size: 15px; line-height: 1.6; }
-
-        /* Animated Entry */
-        .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s ease-out; }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
-        @media (max-width: 1024px) {
-            .hero-container { grid-template-columns: 1fr; text-align: center; padding-top: 120px; }
-            .hero-text h1 { font-size: 50px; }
-            .hero-text p { margin: 0 auto 40px; }
-            .feature-grid { grid-template-columns: 1fr; }
-            .stats-bar { flex-direction: column; gap: 30px; margin: 0 20px 60px; }
-        }
-    </style>
 </head>
 <body>
 
     <div id="navbar-placeholder"></div>
 
-    <!-- Background Decoration -->
+    <!-- Background Blobs -->
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
 
-    <!-- HERO SECTION -->
-    <section class="hero-container">
-        <div class="hero-text reveal">
-            <h1>Healthy Meals, <span>Smarter Mornings.</span></h1>
-            <p>The #1 AI-powered nutrition platform for Indian parents. Plan, track, and optimize your child's tiffins in seconds.</p>
-            <div style="display:flex; gap:15px; flex-wrap:wrap;">
-                <button class="btn btn-primary" onclick="window.location.href='recipes.html'" style="padding: 18px 45px; font-size: 18px; border-radius: 50px; box-shadow: 0 15px 30px rgba(255,122,162,0.3);">View Recipes</button>
-                <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})" style="padding: 18px 35px; border-radius: 50px; font-size: 18px; background:#fff; border:1px solid #e5e7eb; cursor:pointer;">How It Works</button>
+    <!-- ════════════════════════════════════════════════════════
+         HERO SECTION
+         ════════════════════════════════════════════════════════ -->
+    <section class="home-hero">
+        <div class="reveal">
+            <h1>Your Child's <span>Healthiest Week</span> Starts Here.</h1>
+            <p>TiffinGenie uses smart AI to build personalized, balanced meal plans from real Indian home recipes — so mornings are stress-free and tiffins are nutritious.</p>
+            <div class="hero-cta">
+                <button class="btn btn-primary" onclick="window.location.href='onboarding.html'">Get Started Free</button>
+                <button class="btn-outline" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">See How It Works ↓</button>
             </div>
         </div>
-        <div class="hero-image reveal" style="position: relative; height: 520px; display: flex; align-items: center; justify-content: center;">
-            
-            <!-- 3D Kid: OPEN tiffin (behind) -->
-            <img id="heroOpen" src="assets/hero_open.png" alt="Happy child with open tiffin" 
-                 style="position: absolute; width: 100%; max-width: 480px; border-radius: 40px; box-shadow: 0 40px 80px rgba(0,0,0,0.12); z-index: 1; object-fit: cover;">
-            
-            <!-- 3D Kid: CLOSED tiffin (on top, fades out on scroll) -->
-            <img id="heroClosed" src="assets/hero_closed.png" alt="Happy child with closed tiffin" 
-                 style="position: absolute; width: 100%; max-width: 480px; border-radius: 40px; box-shadow: 0 40px 80px rgba(0,0,0,0.12); z-index: 2; object-fit: cover; transition: opacity 0.15s ease, transform 0.15s ease;">
 
-            <!-- Floating UI Card: Nutrition -->
-            <div class="floating-card" id="float1" style="position: absolute; top: 20px; left: -30px; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 18px; box-shadow: 0 15px 35px rgba(0,0,0,0.07); border: 1px solid rgba(255,255,255,0.6); z-index: 4; display: flex; align-items: center; gap: 10px;">
-                <div style="width: 38px; height: 38px; background: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">🥗</div>
-                <div>
-                    <div style="font-size: 11px; color: #6b7280; font-weight: 600;">Nutrition Score</div>
-                    <div style="font-family: 'Fredoka'; color: #065f46; font-size: 15px;">Excellent ✓</div>
+        <!-- Live Dashboard Mockup -->
+        <div class="mockup-wrap reveal">
+            <div class="dashboard-mockup" id="heroMockup">
+                <div class="mock-bar">
+                    <div class="mock-dot" style="background:#fff3"></div>
+                    <div class="mock-dot" style="background:#fff5"></div>
+                    <div class="mock-dot" style="background:#fff3"></div>
+                    <span style="color:#fff;font-size:13px;margin-left:auto;font-weight:600;">TiffinGenie Dashboard</span>
                 </div>
-            </div>
-
-            <!-- Floating UI Card: Plan Ready -->
-            <div class="floating-card" id="float2" style="position: absolute; bottom: 60px; right: -30px; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 18px; box-shadow: 0 15px 35px rgba(0,0,0,0.07); border: 1px solid rgba(255,255,255,0.6); z-index: 4; display: flex; align-items: center; gap: 10px;">
-                <div style="width: 38px; height: 38px; background: #fff0f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">🍱</div>
-                <div>
-                    <div style="font-size: 11px; color: #6b7280; font-weight: 600;">Tomorrow's Tiffin</div>
-                    <div style="font-family: 'Fredoka'; color: #111827; font-size: 15px;">Planned! 🎉</div>
+                <div class="mock-body">
+                    <div class="mock-greeting">Good Morning! 🌤️ Here's Aarav's plan</div>
+                    <div class="mock-plan-grid">
+                        <div class="mock-day-card">
+                            <div class="day">Mon</div>
+                            <div class="meal">🥞 Dosa</div>
+                        </div>
+                        <div class="mock-day-card">
+                            <div class="day">Tue</div>
+                            <div class="meal">🍱 Poha</div>
+                        </div>
+                        <div class="mock-day-card">
+                            <div class="day">Wed</div>
+                            <div class="meal">🥘 Paratha</div>
+                        </div>
+                        <div class="mock-day-card">
+                            <div class="day">Thu</div>
+                            <div class="meal">🍛 Upma</div>
+                        </div>
+                        <div class="mock-day-card">
+                            <div class="day">Fri</div>
+                            <div class="meal">🥗 Idli</div>
+                        </div>
+                        <div class="mock-day-card">
+                            <div class="day">Sat</div>
+                            <div class="meal">🥪 Sandwich</div>
+                        </div>
+                    </div>
+                    <div class="mock-score-bar">
+                        <span>Weekly Health Score</span>
+                        <span>92/100 🎯</span>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Floating UI Card: AI badge -->
-            <div class="floating-card" id="float3" style="position: absolute; top: 50%; left: -50px; background: rgba(255,122,162,0.95); backdrop-filter: blur(12px); padding: 10px 16px; border-radius: 14px; box-shadow: 0 12px 30px rgba(255,122,162,0.3); z-index: 4; display: flex; align-items: center; gap: 8px; color: #fff;">
-                <span style="font-size: 16px;">🤖</span>
-                <span style="font-size: 12px; font-weight: 700;">AI Powered</span>
-            </div>
-
-        </div>
-    </section>
-
-    <style>
-        .floating-card {
-            transition: transform 0.2s ease-out;
-            animation: cardFloat 4s ease-in-out infinite;
-        }
-        #float1 { animation-delay: 0s; }
-        #float2 { animation-delay: 1.5s; }
-        #float3 { animation-delay: 3s; }
-        @keyframes cardFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-    </style>
-
-    <!-- STATS BAR -->
-    <div class="stats-bar reveal">
-        <div class="stat-item">
-            <h4>50,000+</h4>
-            <p>Happy Parents</p>
-        </div>
-        <div class="stat-item">
-            <h4>1.2 Million</h4>
-            <p>Meals Generated</p>
-        </div>
-        <div class="stat-item">
-            <h4>4.9/5</h4>
-            <p>App Store Rating</p>
-        </div>
-    </div>
-
-    <!-- FEATURES SECTION -->
-    <section id="features" class="features-section">
-        <span class="section-tag">Powerful Features</span>
-        <h2 class="section-title">Designed for Modern Parenting</h2>
-        
-        <div class="feature-grid">
-            <div class="feature-card reveal">
-                <span class="feature-icon">🤖</span>
-                <h3>AI Planner</h3>
-                <p>Personalized meal plans based on your child's age, weight, and favorite home foods.</p>
-            </div>
-            <div class="feature-card reveal">
-                <span class="feature-icon">📊</span>
-                <h3>Health Scores</h3>
-                <p>Real-time nutritional insights for every meal. Balance protein, fiber, and energy perfectly.</p>
-            </div>
-            <div class="feature-card reveal">
-                <span class="feature-icon">🛒</span>
-                <h3>Smart Grocery</h3>
-                <p>Automated shopping lists scaled to your family size. One-click and you're ready to cook.</p>
             </div>
         </div>
     </section>
 
-    <!-- THE GENIE GUARANTEE -->
-    <section style="background: #fff0f5; padding: 100px 8%; text-align: center; margin: 80px 5%; border-radius: 60px;">
-        <div style="max-width: 800px; margin: 0 auto;" class="reveal">
-            <h2 style="font-family: 'Fredoka'; font-size: 44px; color: #111827; margin-bottom: 25px;">The Genie Guarantee 🧞‍♂️</h2>
-            <p style="font-size: 20px; color: #4b5563; line-height: 1.8; margin-bottom: 45px;">
-                "We believe every child deserves a healthy start. If TiffinGenie doesn't save you 3 hours a week and make your mornings 100% stress-free, we'll give you your Pro Plan back. No questions asked."
-            </p>
-            <button class="btn btn-primary" onclick="window.location.href='onboarding.html'" style="padding: 18px 45px; border-radius:50px;">Start Your Journey</button>
+    <!-- ════════════════════════════════════════════════════════
+         HOW IT WORKS
+         ════════════════════════════════════════════════════════ -->
+    <section id="how-it-works" class="hiw-section">
+        <span class="section-label reveal">Simple & Smart</span>
+        <h2 class="section-heading reveal">Three Steps to Stress-Free Mornings</h2>
+        <p class="section-desc reveal" style="margin:0 auto 0;">No complicated setup. Just answer a few questions and let the Genie do its magic.</p>
+
+        <div class="hiw-grid">
+            <div class="hiw-card reveal">
+                <div class="hiw-num">1</div>
+                <span class="hiw-icon">👶</span>
+                <h3>Tell Us About Your Child</h3>
+                <p>Age, weight, dietary preferences, and allergies — a quick 30-second onboarding.</p>
+            </div>
+            <div class="hiw-card reveal">
+                <div class="hiw-num">2</div>
+                <span class="hiw-icon">🤖</span>
+                <h3>AI Builds Your Plan</h3>
+                <p>Our engine generates a full week of breakfast, lunch, and dinner using real home recipes.</p>
+            </div>
+            <div class="hiw-card reveal">
+                <div class="hiw-num">3</div>
+                <span class="hiw-icon">🛒</span>
+                <h3>Cook, Track & Thrive</h3>
+                <p>Get auto-generated grocery lists, track nutrition scores, and swap meals anytime.</p>
+            </div>
         </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════
+         FEATURE DEEP DIVES
+         ════════════════════════════════════════════════════════ -->
+    <section class="fd-section">
+        <!-- Feature 1: AI Planner -->
+        <div class="fd-row">
+            <div class="fd-visual reveal-left">
+                <span class="big-emoji">🧠</span>
+            </div>
+            <div class="fd-text reveal-right">
+                <span class="section-label">Intelligent Engine</span>
+                <h3>AI That Understands Indian Kitchens</h3>
+                <p>No generic Western diets. TiffinGenie is trained on real Indian home food — from Poha to Paneer Paratha. It learns your child's favorites and builds plans that actually get eaten.</p>
+                <div class="fd-chips">
+                    <span class="fd-chip">🍛 Regional Cuisines</span>
+                    <span class="fd-chip">🥬 Veg & Non-Veg</span>
+                    <span class="fd-chip">⚡ Instant Refresh</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 2: Nutrition Tracking -->
+        <div class="fd-row reverse">
+            <div class="fd-visual reveal-right">
+                <span class="big-emoji">📊</span>
+            </div>
+            <div class="fd-text reveal-left">
+                <span class="section-label">Health Intelligence</span>
+                <h3>Real Nutrition, Not Guesswork</h3>
+                <p>Every meal comes with a Health Score. Track protein, fiber, vitamins, and energy balance across the entire week — all visualized in a simple, parent-friendly dashboard.</p>
+                <div class="fd-chips">
+                    <span class="fd-chip">💪 Protein Tracking</span>
+                    <span class="fd-chip">🎯 Weekly Scores</span>
+                    <span class="fd-chip">📈 Progress View</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 3: Grocery -->
+        <div class="fd-row">
+            <div class="fd-visual reveal-left">
+                <span class="big-emoji">🛒</span>
+            </div>
+            <div class="fd-text reveal-right">
+                <span class="section-label">Zero Effort Shopping</span>
+                <h3>Grocery Lists That Write Themselves</h3>
+                <p>Every plan auto-generates a smart grocery list with exact quantities scaled to your child's age. No more second-guessing at the store.</p>
+                <div class="fd-chips">
+                    <span class="fd-chip">📋 Auto-Generated</span>
+                    <span class="fd-chip">⚖️ Age-Scaled Qty</span>
+                    <span class="fd-chip">✅ One-Tap Check</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════════════════════════════════════════════
+         FINAL CTA
+         ════════════════════════════════════════════════════════ -->
+    <section class="cta-banner reveal">
+        <div class="cta-sparkle" style="top:-100px;right:-100px;"></div>
+        <div class="cta-sparkle" style="bottom:-80px;left:-80px;width:200px;height:200px;"></div>
+        <h2>Ready to Transform Tiffin Time?</h2>
+        <p>Join thousands of Indian parents who have made their mornings easier and their kids healthier.</p>
+        <button class="btn-white" onclick="window.location.href='onboarding.html'">Start Planning — It's Free</button>
     </section>
 
     <div id="footer-placeholder"></div>
@@ -261,43 +183,37 @@
     <script src="js/assistant.js"></script>
 
     <script>
-        // 3D Kid Tiffin Crossfade + Parallax
-        window.addEventListener("scroll", function() {
-            var closed = document.getElementById("heroClosed");
-            var float1 = document.getElementById("float1");
-            var float2 = document.getElementById("float2");
-            var float3 = document.getElementById("float3");
-            var scrollPos = window.scrollY;
-            var maxScroll = 400;
-            
-            // Smooth crossfade: closed image fades out revealing open image
-            var progress = Math.min(scrollPos / maxScroll, 1);
-            if (closed) {
-                closed.style.opacity = 1 - progress;
-                closed.style.transform = "scale(" + (1 + progress * 0.03) + ")";
-            }
-            
-            // Parallax on floating cards
-            if (float1) float1.style.transform = "translateY(" + (scrollPos * 0.12 - Math.sin(Date.now()/1000) * 5) + "px)";
-            if (float2) float2.style.transform = "translateY(" + (-scrollPos * 0.08) + "px)";
-            if (float3) float3.style.transform = "translateY(" + (scrollPos * 0.05) + "px)";
-        });
-
-        // Scroll Reveal Animation
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 150;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
-                }
-            }
+        // ── Scroll Reveal Engine ──
+        function revealOnScroll() {
+            document.querySelectorAll(".reveal, .reveal-left, .reveal-right").forEach(function(el) {
+                var top = el.getBoundingClientRect().top;
+                if (top < window.innerHeight - 120) el.classList.add("active");
+            });
         }
-        window.addEventListener("scroll", reveal);
-        // Trigger once on load
-        document.addEventListener("DOMContentLoaded", reveal);
+        window.addEventListener("scroll", revealOnScroll);
+        document.addEventListener("DOMContentLoaded", revealOnScroll);
+
+        // ── 3D Tilt on Dashboard Mockup ──
+        var mockup = document.getElementById("heroMockup");
+        if (mockup) {
+            mockup.addEventListener("mousemove", function(e) {
+                var rect = mockup.getBoundingClientRect();
+                var x = (e.clientX - rect.left) / rect.width - 0.5;
+                var y = (e.clientY - rect.top) / rect.height - 0.5;
+                mockup.style.transform = "rotateY(" + (x * 12) + "deg) rotateX(" + (-y * 8) + "deg) scale(1.02)";
+            });
+            mockup.addEventListener("mouseleave", function() {
+                mockup.style.transform = "rotateY(-5deg) rotateX(3deg)";
+            });
+        }
+
+        // ── Parallax Blobs on Scroll ──
+        window.addEventListener("scroll", function() {
+            var s = window.scrollY;
+            document.querySelectorAll(".blob").forEach(function(b, i) {
+                b.style.transform = "translateY(" + (s * (0.03 + i * 0.015)) + "px)";
+            });
+        });
     </script>
 </body>
 </html>
