@@ -930,4 +930,53 @@ function initDashboard() {
     }
 }
 
+window.exportPlanToPDF = function() {
+    var plan = JSON.parse(localStorage.getItem("weeklyPlan") || "{}");
+    var grid = document.getElementById("printGrid");
+    var template = document.getElementById("printTemplate");
+    if (!plan || Object.keys(plan).length === 0) {
+        alert("Please generate a meal plan first!");
+        return;
+    }
+
+    // Populate Print Template
+    var html = "";
+    var DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    
+    DAYS.forEach(function(day) {
+        var d = plan[day];
+        if (!d) return;
+        
+        html += `
+            <div style="border: 1px solid #f0f0f0; border-radius: 15px; padding: 15px; background: #fffafb;">
+                <h3 style="margin: 0 0 10px; color: #ff7aa2; font-family: 'Fredoka'; font-size: 20px;">${day}</h3>
+                <div style="margin-bottom: 8px; font-size: 14px;">
+                    <span style="font-weight: bold; color: #4b5563;">🌅 Breakfast:</span> ${d.breakfast ? d.breakfast.name : 'Not planned'}
+                </div>
+                <div style="margin-bottom: 8px; font-size: 14px;">
+                    <span style="font-weight: bold; color: #4b5563;">☀️ Lunch:</span> ${d.lunch ? d.lunch.name : 'Not planned'}
+                </div>
+                <div style="font-size: 14px;">
+                    <span style="font-weight: bold; color: #4b5563;">🌙 Dinner:</span> ${d.dinner ? d.dinner.name : 'Not planned'}
+                </div>
+            </div>
+        `;
+    });
+    grid.innerHTML = html;
+
+    // Trigger PDF generation
+    template.style.display = "block"; // Temporarily show for capture
+    var opt = {
+        margin:       10,
+        filename:     'TiffinGenie_Weekly_Plan.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().from(template).set(opt).save().then(function() {
+        template.style.display = "none";
+    });
+};
+
 window.addEventListener("DOMContentLoaded", initDashboard);
