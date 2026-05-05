@@ -57,9 +57,9 @@ function getMealWeight(meal, prefs) {
     // Swapping 3 times reduces weight by 0.9, meaning it's very unlikely to be picked, but never 0.
     var weight = 1.0 + (p.selected * 0.4) - (p.swappedOut * 0.3);
 
-    // Always give custom meals a significant boost so they actually appear in "options"
-    if (meal.custom) {
-        weight *= 3.0; 
+    // Always give custom/community meals a significant boost so they actually appear in "options"
+    if (meal.custom || meal.community) {
+        weight *= 4.0; 
     }
 
     // Favourites boost: meals hearted in Genie Kitchen get priority
@@ -124,6 +124,18 @@ function getCustomMeals(cuisine) {
     return result;
 }
 
+function getCommunityMeals() {
+    var raw = localStorage.getItem("communityRecipes");
+    if (!raw) return { breakfast: [], lunch: [], dinner: [] };
+    var list = JSON.parse(raw);
+    var result = { breakfast: [], lunch: [], dinner: [] };
+    list.forEach(function(m) {
+        var t = m.type.toLowerCase();
+        if (result[t]) result[t].push({ name: m.name, tags: m.tags, custom: true, community: true });
+    });
+    return result;
+}
+
 // ─── GENERATE WEEKLY PLAN ──────────────────────────────────────────────────────
 function generateWeeklyPlan(profile) {
     var cuisine  = profile.cuisine || (profile.diet === "non-veg" ? "indian_nonveg" : "indian_veg");
@@ -134,10 +146,11 @@ function generateWeeklyPlan(profile) {
 
     var db     = MEAL_DB[cuisine] || MEAL_DB["indian_veg"];
     var custom = getCustomMeals(cuisine);
+    var comm   = getCommunityMeals();
 
-    var breakfasts = filterByAllergy(db.breakfast.concat(custom.breakfast), allergies);
-    var lunches    = filterByAllergy(db.lunch.concat(custom.lunch),         allergies);
-    var dinners    = filterByAllergy(db.dinner.concat(custom.dinner),       allergies);
+    var breakfasts = filterByAllergy(db.breakfast.concat(custom.breakfast, comm.breakfast), allergies);
+    var lunches    = filterByAllergy(db.lunch.concat(custom.lunch, comm.lunch),         allergies);
+    var dinners    = filterByAllergy(db.dinner.concat(custom.dinner, comm.dinner),       allergies);
 
     console.log("[ENGINE] Breakfast pool:", breakfasts.map(function(m){ return m.name; }));
     console.log("[ENGINE] Lunch pool:",    lunches.map(function(m){ return m.name; }));
