@@ -151,34 +151,38 @@
                 <button class="btn btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})" style="padding: 18px 35px; border-radius: 50px; font-size: 18px; background:#fff; border:1px solid #e5e7eb; cursor:pointer;">How It Works</button>
             </div>
         </div>
-        <div class="hero-image reveal" style="position: relative; height: 500px; display: flex; align-items: center; justify-content: center;">
+        <div class="hero-image reveal" style="position: relative; height: 520px; display: flex; align-items: center; justify-content: center;">
             
-            <!-- Main Realistic Image -->
-            <div style="position: relative; width: 320px; height: 400px; border-radius: 40px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.15); z-index: 2;">
-                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Healthy Realistic Meal" style="width: 100%; height: 100%; object-fit: cover;">
-                <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);"></div>
-                <div style="position: absolute; bottom: 20px; left: 20px; color: #fff;">
-                    <div style="font-family: 'Fredoka'; font-size: 22px;">Genie's Choice</div>
-                    <div style="font-size: 13px; opacity: 0.9;">Balanced & Kid-Approved</div>
+            <!-- 3D Kid: OPEN tiffin (behind) -->
+            <img id="heroOpen" src="assets/hero_open.png" alt="Happy child with open tiffin" 
+                 style="position: absolute; width: 100%; max-width: 480px; border-radius: 40px; box-shadow: 0 40px 80px rgba(0,0,0,0.12); z-index: 1; object-fit: cover;">
+            
+            <!-- 3D Kid: CLOSED tiffin (on top, fades out on scroll) -->
+            <img id="heroClosed" src="assets/hero_closed.png" alt="Happy child with closed tiffin" 
+                 style="position: absolute; width: 100%; max-width: 480px; border-radius: 40px; box-shadow: 0 40px 80px rgba(0,0,0,0.12); z-index: 2; object-fit: cover; transition: opacity 0.15s ease, transform 0.15s ease;">
+
+            <!-- Floating UI Card: Nutrition -->
+            <div class="floating-card" id="float1" style="position: absolute; top: 20px; left: -30px; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 18px; box-shadow: 0 15px 35px rgba(0,0,0,0.07); border: 1px solid rgba(255,255,255,0.6); z-index: 4; display: flex; align-items: center; gap: 10px;">
+                <div style="width: 38px; height: 38px; background: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">🥗</div>
+                <div>
+                    <div style="font-size: 11px; color: #6b7280; font-weight: 600;">Nutrition Score</div>
+                    <div style="font-family: 'Fredoka'; color: #065f46; font-size: 15px;">Excellent ✓</div>
                 </div>
             </div>
 
-            <!-- Floating UI Card 1 -->
-            <div class="floating-card" id="float1" style="position: absolute; top: 40px; left: -40px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 15px 20px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5); z-index: 3; display: flex; align-items: center; gap: 12px;">
-                <div style="width: 40px; height: 40px; background: #d1fae5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">🥗</div>
+            <!-- Floating UI Card: Plan Ready -->
+            <div class="floating-card" id="float2" style="position: absolute; bottom: 60px; right: -30px; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); padding: 14px 18px; border-radius: 18px; box-shadow: 0 15px 35px rgba(0,0,0,0.07); border: 1px solid rgba(255,255,255,0.6); z-index: 4; display: flex; align-items: center; gap: 10px;">
+                <div style="width: 38px; height: 38px; background: #fff0f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">🍱</div>
                 <div>
-                    <div style="font-size: 12px; color: #6b7280; font-weight: 600;">Fiber Target</div>
-                    <div style="font-family: 'Fredoka'; color: #065f46; font-size: 16px;">Hit 100%</div>
+                    <div style="font-size: 11px; color: #6b7280; font-weight: 600;">Tomorrow's Tiffin</div>
+                    <div style="font-family: 'Fredoka'; color: #111827; font-size: 15px;">Planned! 🎉</div>
                 </div>
             </div>
 
-            <!-- Floating UI Card 2 -->
-            <div class="floating-card" id="float2" style="position: absolute; bottom: 80px; right: -50px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 15px 20px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5); z-index: 3; display: flex; align-items: center; gap: 12px;">
-                <div style="width: 40px; height: 40px; background: #fff0f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px;">🍱</div>
-                <div>
-                    <div style="font-size: 12px; color: #6b7280; font-weight: 600;">Tomorrow's Tiffin</div>
-                    <div style="font-family: 'Fredoka'; color: #111827; font-size: 16px;">Planned!</div>
-                </div>
+            <!-- Floating UI Card: AI badge -->
+            <div class="floating-card" id="float3" style="position: absolute; top: 50%; left: -50px; background: rgba(255,122,162,0.95); backdrop-filter: blur(12px); padding: 10px 16px; border-radius: 14px; box-shadow: 0 12px 30px rgba(255,122,162,0.3); z-index: 4; display: flex; align-items: center; gap: 8px; color: #fff;">
+                <span style="font-size: 16px;">🤖</span>
+                <span style="font-size: 12px; font-weight: 700;">AI Powered</span>
             </div>
 
         </div>
@@ -186,7 +190,15 @@
 
     <style>
         .floating-card {
-            transition: transform 0.1s linear;
+            transition: transform 0.2s ease-out;
+            animation: cardFloat 4s ease-in-out infinite;
+        }
+        #float1 { animation-delay: 0s; }
+        #float2 { animation-delay: 1.5s; }
+        #float3 { animation-delay: 3s; }
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
     </style>
 
@@ -249,17 +261,26 @@
     <script src="js/assistant.js"></script>
 
     <script>
-        // Parallax Floating Cards Interaction
+        // 3D Kid Tiffin Crossfade + Parallax
         window.addEventListener("scroll", function() {
+            var closed = document.getElementById("heroClosed");
             var float1 = document.getElementById("float1");
             var float2 = document.getElementById("float2");
+            var float3 = document.getElementById("float3");
             var scrollPos = window.scrollY;
+            var maxScroll = 400;
             
-            if (float1 && float2) {
-                // Move elements at different speeds for parallax effect
-                float1.style.transform = `translateY(${scrollPos * 0.15}px)`;
-                float2.style.transform = `translateY(-${scrollPos * 0.1}px)`;
+            // Smooth crossfade: closed image fades out revealing open image
+            var progress = Math.min(scrollPos / maxScroll, 1);
+            if (closed) {
+                closed.style.opacity = 1 - progress;
+                closed.style.transform = "scale(" + (1 + progress * 0.03) + ")";
             }
+            
+            // Parallax on floating cards
+            if (float1) float1.style.transform = "translateY(" + (scrollPos * 0.12 - Math.sin(Date.now()/1000) * 5) + "px)";
+            if (float2) float2.style.transform = "translateY(" + (-scrollPos * 0.08) + "px)";
+            if (float3) float3.style.transform = "translateY(" + (scrollPos * 0.05) + "px)";
         });
 
         // Scroll Reveal Animation
